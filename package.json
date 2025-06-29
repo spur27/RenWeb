@@ -1,0 +1,25 @@
+{
+  "name": "Program Name",
+  "version": "1.0.0",
+  "description": "Description",
+  "license": "License",
+  "author": "Author",
+  "main_page": "test_react",
+  "src_dir_name": "src",
+  "pages_dir_name": "pages",
+  "scripts": {
+    "install-for-scripts": "cd ./scripts && npm install",
+    "build": "cd ./scripts && npm run build",
+    "compile-build": "cd ./scripts && npm run compile && npm run build",
+    "validate": "cd ./scripts && npm run validate"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "typescript": "^5.8.3"
+  },
+  "private": true,
+  "type": "module"
+}

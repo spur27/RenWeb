@@ -1,4 +1,7 @@
 .sconsign.dblite
 *.o
-*/build/*/*
+build
 .cache
+node_modules
+package-lock.json
+dist

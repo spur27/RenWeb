@@ -16,7 +16,7 @@ namespace Vanitas {
         }
         namespace Filesystem {
             void bind_readFile(Vanitas::Webview*);
-            void bind_writeFile(Vanitas::Webview*);
+            // void bind_writeFile(Vanitas::Webview*);
             void bind_exists(Vanitas::Webview*);
             void bind_mkDir(Vanitas::Webview*);
             void bind_rmDir(Vanitas::Webview*);
@@ -27,7 +27,7 @@ namespace Vanitas {
         }
         namespace Webview {
             void bind_saveSettings(Vanitas::Webview*);
-            void bind_setSettings(Vanitas::Webview*);
+            // void bind_setSettings(Vanitas::Webview*);
             void bind_readSettings(Vanitas::Webview*);
             void bind_setHTML(Vanitas::Webview*);
             void bind_setHTMLToDoc(Vanitas::Webview*);

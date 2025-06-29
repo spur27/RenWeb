@@ -1,1 +1,0 @@
-scons && ulimit -n 20000 && valgrind -s ./build/debug/van_engine

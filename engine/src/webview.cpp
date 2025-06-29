@@ -94,6 +94,18 @@ Vanitas::Webview* Vanitas::Webview::bindAll() {
     Vanitas::Bindings::Log::bind_logError(this);
     Vanitas::Bindings::Log::bind_logCritical(this);
 
+    Vanitas::Bindings::Filesystem::bind_readFile(this);
+    // Vanitas::Bindings::Filesystem::bind_writeFile(this);
+    Vanitas::Bindings::Filesystem::bind_exists(this);
+    Vanitas::Bindings::Filesystem::bind_mkDir(this);
+    Vanitas::Bindings::Filesystem::bind_rmDir(this);
+    Vanitas::Bindings::Filesystem::bind_ls(this);
+    // Vanitas::Bindings::Filesystem::bind_rename(this);
+    // Vanitas::Bindings::Filesystem::bind_move(this);
+    // Vanitas::Bindings::Filesystem::bind_copyFile(this);
+
+    Vanitas::Bindings::Webview::bind_saveSettings(this);
+    // Vanitas::Bindings::Webview::bind_setSettings(this);
     Vanitas::Bindings::Webview::bind_readSettings(this);
     Vanitas::Bindings::Webview::bind_setHTML(this);
     Vanitas::Bindings::Webview::bind_setHTMLToDoc(this);

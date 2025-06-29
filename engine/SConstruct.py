@@ -2,6 +2,8 @@ APPLICATION_NAME = "van_engine"
 
 import os
 import sys
+import re
+import json
 from datetime import datetime
 from termcolor import colored
 os.system("clear")
@@ -25,10 +27,15 @@ def getTargetType():
         return "debug"
 
 # TARGET = getTargetType()
-TARGET = "release"
+TARGET = "debug"
 build_print(f"Building for '{gray(TARGET)}'")
 
-BUILD_PATH = f"build/{TARGET}/{APPLICATION_NAME.lower()}"
+with open("../package.json") as package_json:
+    package_json_data = json.load(package_json)
+if ("name" not in package_json_data):
+    package_json_data["name"] = "default_project_name"
+print(package_json_data["name"])
+BUILD_PATH = f"../build/{re.sub(r"\s", "_", package_json_data["name"].strip().lower())}"
 SOURCE = [
     'src/app.cpp',
     'src/base_rw.cpp',

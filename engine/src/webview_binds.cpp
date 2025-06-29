@@ -3,11 +3,40 @@
 #include "base_rw.hpp"
 #include "config.hpp"
 #include <boost/process/system.hpp>
+#include <exception>
 #include <filesystem>
+#include <fstream>
+#include <spdlog/spdlog.h>
+#include <sstream>
+#include <system_error>
 
-std::string s(std::string str) {
+// Surrounds a string with quotes
+std::string jsonStr(std::string str) {
     return std::string('"' + str + '"');
 }
+
+// Removes the surrounding quotes from a JSON dumped string
+std::string jsonDestr(std::string str) {
+    return str.substr(1, str.length()-2);
+}
+
+// Gets JSON contents as a usable std::string
+std::string jsonTostr(json json_v, int indent=-1) {
+    std::string json_str = json_v.dump(indent);
+    if (json_v.is_string()) {
+        json_str = jsonDestr(json_str);
+    }
+    return json_str;
+}
+
+// Returns the contents parsed from the params to be output in the log
+std::string jsonLogBindingHandler(const std::string& req) {
+    json params = json::parse(req);
+    json param0 = params[0];
+    return jsonTostr(param0, 0);
+}
+
+
 
 // ------------------------------------------------------------
 // ------------------------------------------------------------
@@ -15,48 +44,42 @@ std::string s(std::string str) {
 void Vanitas::Bindings::Log::bind_logTrace(Vanitas::Webview* w) {
     const std::string fn_name = "BIND_logTrace";
     w->bindFunction(fn_name, [](const std::string& req) -> std::string {
-        json params = json::parse(req);
-        spdlog::trace(params[0].dump(0));
+        spdlog::trace(jsonLogBindingHandler(req));
         return "null";
     });
 }
 void Vanitas::Bindings::Log::bind_logDebug(Vanitas::Webview* w) {
     const std::string fn_name = "BIND_logDebug";
     w->bindFunction(fn_name, [](const std::string& req) -> std::string {
-        json params = json::parse(req);
-        spdlog::debug(params[0].dump(0));
+        spdlog::debug(jsonLogBindingHandler(req));
         return "null";
     });
 }
 void Vanitas::Bindings::Log::bind_logInfo(Vanitas::Webview* w) {
     const std::string fn_name = "BIND_logInfo";
     w->bindFunction(fn_name, [](const std::string& req) -> std::string {
-        json params = json::parse(req);
-        spdlog::info(params[0].dump(0));
+        spdlog::info(jsonLogBindingHandler(req));
         return "null";
     });
 }
 void Vanitas::Bindings::Log::bind_logWarn(Vanitas::Webview* w) {
     const std::string fn_name = "BIND_logWarn";
     w->bindFunction(fn_name, [](const std::string& req) -> std::string {
-        json params = json::parse(req);
-        spdlog::warn(params[0].dump(0));
+        spdlog::warn(jsonLogBindingHandler(req));
         return "null";
     });
 }
 void Vanitas::Bindings::Log::bind_logError(Vanitas::Webview* w) {
     const std::string fn_name = "BIND_logError";
     w->bindFunction(fn_name, [](const std::string& req) -> std::string {
-        json params = json::parse(req);
-        spdlog::error(params[0].dump(0));
+        spdlog::error(jsonLogBindingHandler(req));
         return "null";
     });
 }
 void Vanitas::Bindings::Log::bind_logCritical(Vanitas::Webview* w) {
     const std::string fn_name = "BIND_logCritical";
     w->bindFunction(fn_name, [](const std::string& req) -> std::string {
-        json params = json::parse(req);
-        spdlog::critical(params[0].dump(0));
+        spdlog::critical(jsonLogBindingHandler(req));
         return "null";
     });
 }
@@ -64,7 +87,113 @@ void Vanitas::Bindings::Log::bind_logCritical(Vanitas::Webview* w) {
 // ------------------------------------------------------------
 // ------------------------------------------------------------
 
-// void bind_saveSettings(Vanitas::Webview* w);
+// BROKEN! FILES WITH CERTAIN CHARACTERS (\n) WONT BE PROCESSED
+void Vanitas::Bindings::Filesystem::bind_readFile(Vanitas::Webview* w) {
+    const std::string fn_name = "BIND_readFile";
+    w->bindFunction(fn_name, [](const std::string& req) -> std::string {
+        json params = json::parse(req);
+        json param0 = params[0];
+        if (param0.is_null()) {
+            return "null";
+        }
+        std::string param0_str = jsonTostr(param0);
+        if (!std::filesystem::exists(param0_str)) {
+            spdlog::error(std::string("No file exists at path: ") + param0_str);
+            return "null";
+        }
+        spdlog::debug(std::string("trying to read file of path: ") + param0_str);
+        std::ifstream file;
+        std::ostringstream str;
+        file.open(param0_str);
+        str << file.rdbuf();
+        file.close();
+        spdlog::debug(jsonStr(str.str()));
+        return jsonStr(str.str());
+    });
+}
+// void Vanitas::Bindings::Filesystem::bind_writeFile(Vanitas::Webview* w) { }
+void Vanitas::Bindings::Filesystem::bind_exists(Vanitas::Webview* w) {
+    const std::string fn_name = "BIND_exists";
+    w->bindFunction(fn_name, [](const std::string& req) -> std::string {
+        json params = json::parse(req);
+        json param0 = params[0];
+        std::string param0_str = jsonTostr(param0);
+        if (std::filesystem::exists(param0_str)) {
+            return "true";
+        } else {
+            return "false";
+        }
+    });
+}
+void Vanitas::Bindings::Filesystem::bind_mkDir(Vanitas::Webview* w) {
+    const std::string fn_name = "BIND_mkDir";
+    w->bindFunction(fn_name, [](const std::string& req) -> std::string {
+        json params = json::parse(req);
+        json param0 = params[0];
+        std::string param0_str = jsonTostr(param0);
+        std::error_code ec;
+        bool result = std::filesystem::create_directory(param0_str, ec);
+        if (result) {
+            return "true";
+        } else {
+            spdlog::error(ec.message());
+            return "false";
+        }
+    });
+}
+void Vanitas::Bindings::Filesystem::bind_rmDir(Vanitas::Webview* w) {
+    const std::string fn_name = "BIND_rmDir";
+    w->bindFunction(fn_name, [](const std::string& req) -> std::string {
+        json params = json::parse(req);
+        json param0 = params[0];
+        std::string param0_str = jsonTostr(param0);
+        std::error_code ec;
+        bool result = std::filesystem::remove(param0_str, ec);
+        if (result) {
+            return "true";
+        } else {
+            spdlog::error(ec.message());
+            return "false";
+        }
+    });
+}
+void Vanitas::Bindings::Filesystem::bind_ls(Vanitas::Webview* w) {
+    const std::string fn_name = "BIND_ls";
+    w->bindFunction(fn_name, [](const std::string& req) -> std::string {
+        json params = json::parse(req);
+        json param0 = params[0];
+        std::string param0_str = jsonTostr(param0);
+        if (!std::filesystem::is_directory(param0_str)) {
+            spdlog::error("Entered path either isn't a directory or doesn't exist:");
+            spdlog::error(param0_str);
+            return "null";
+        }
+        std::error_code ec;
+        json array = json::array();
+        int index = 0;
+        for (const auto& entry : std::filesystem::directory_iterator(param0_str)) {
+            array[index] = entry.path();
+            index++;
+        }
+        return array.dump();
+    });
+}
+// void bind_rename(Vanitas::Webview*);
+// void bind_move(Vanitas::Webview*);
+// void bind_copyFile(Vanitas::Webview*);
+
+
+// ------------------------------------------------------------
+// ------------------------------------------------------------
+
+void Vanitas::Bindings::Webview::bind_saveSettings(Vanitas::Webview* w) {
+    const std::string fn_name = "BIND_saveSettings";
+    w->bindFunction(fn_name, [w](const std::string& req) -> std::string {
+        (void)req;
+        w->info->save();
+        return "null";
+    });
+}
 // void bind_setSettings(Vanitas::Webview* w);
 void Vanitas::Bindings::Webview::bind_readSettings(Vanitas::Webview* w) {
     const std::string fn_name = "BIND_readSettings";
@@ -108,7 +237,22 @@ void Vanitas::Bindings::Webview::bind_setHTMLToDoc(Vanitas::Webview* w) {
         return "null";
     }); 
 }
-// void bind_setSize(Vanitas::Webview* w);
+void Vanitas::Bindings::Webview::bind_setSize(Vanitas::Webview* w) {
+    const std::string fn_name = "BIND_setSize";
+    w->bindFunction(fn_name, [/*w*/](const std::string& req) -> std::string {
+        json params = json::parse(req);
+        json param0 = params[0];
+        json param1 = params[1];
+        json param2 = params[2];
+        // if (param0.is_string()) {
+        //     std::string param0_str = param0.dump();
+        //     w->setTitle(param0.dump().substr(1, param0_str.length()-2));
+        // } else {
+        //     w->setTitle(param0.dump());
+        // }
+        return "null";
+    }); 
+}
 void Vanitas::Bindings::Webview::bind_setTitle(Vanitas::Webview* w) {
     const std::string fn_name = "BIND_setTitle";
     w->bindFunction(fn_name, [w](const std::string& req) -> std::string {
@@ -171,7 +315,7 @@ void Vanitas::Bindings::Util::bind_getApplicationDirPath(Vanitas::Webview* w) {
     const std::string fn_name = "BIND_getApplicationDirPath";
     w->bindFunction(fn_name, [](const std::string& req) -> std::string {
         (void)req;
-        return s(Vanitas::BaseRW::getApplicationDirPath());
+        return jsonStr(Vanitas::BaseRW::getApplicationDirPath());
     });
 }
 
@@ -179,6 +323,6 @@ void Vanitas::Bindings::Util::bind_getHTMLDocName(Vanitas::Webview* w) {
     const std::string fn_name = "BIND_getHTMLDocName";
     w->bindFunction(fn_name, [w](const std::string& req) -> std::string {
         (void)req;
-        return s(w->info->html_doc_name);
+        return jsonStr(w->info->html_doc_name);
     });
 }
