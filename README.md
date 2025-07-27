@@ -2,7 +2,7 @@
 <!-- [![RenWeb ~ a FOSS Software SDK](docs/assets/renweb.png)](https://github.com/SpurSlicer/Mauve) -->
 <p align="center">
     <a href="https://github.com/SpurSlicer/Mauve">
-        <img src="https://github.com/SpurSlicer/RenWeb/blob/main/docs/assets/renweb.png" alt="Renweb ~ A FOSS Software SDK">
+        <img height=250 src="https://github.com/SpurSlicer/RenWeb/blob/main/docs/assets/renweb.png" alt="Renweb ~ A FOSS Software SDK">
     </a>
 </p>
 
@@ -31,7 +31,7 @@
 ## Introduction
 RenWeb is a combined engine and toolset for developing GUI applications with web technology written mostly in C++.
 <p align="center">
-        <img src="https://github.com/SpurSlicer/RenWeb/blob/main/docs/assets/window_example_1.png" alt="Renweb ~ A FOSS Software SDK">
+        <img height=500 src="https://github.com/SpurSlicer/RenWeb/blob/main/docs/assets/window_example_1.png" alt="Renweb ~ A FOSS Software SDK">
 </p>
 
 The RenWeb engine is built with multithreaded web server,  a process manager, all main window technologies, a logger, and more! It takes on a portable structure, searching for files in whatever directory it is placed in. In addition, RenWeb aims to provide full support for *front-end* node libraries as well as JS frameworks like react, offering for more sophisticated development.
