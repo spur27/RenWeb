@@ -8,7 +8,7 @@
 
 (*Worflow badges will go here*)
 
-- [Intro to Ren Web](#intro-to-ren-web)
+- [Introduction](#introduction)
 - [Compilation](#compilation)
   - [Linux](#linux)
   - [MacOS](#macos)
@@ -28,10 +28,10 @@
 - [License](#license)
 
 
-## Intro to Ren Web
+## Introduction
 RenWeb is a combined engine and toolset for developing GUI applications with web technology written mostly in C++.
 <p align="center">
-        <img width="200" src="https://github.com/SpurSlicer/RenWeb/blob/main/docs/assets/window_example_1.png" alt="Renweb ~ A FOSS Software SDK">
+        <img src="https://github.com/SpurSlicer/RenWeb/blob/main/docs/assets/window_example_1.png" alt="Renweb ~ A FOSS Software SDK">
 </p>
 
 The RenWeb engine is built with multithreaded web server,  a process manager, all main window technologies, a logger, and more! It takes on a portable structure, searching for files in whatever directory it is placed in. In addition, RenWeb aims to provide full support for *front-end* node libraries as well as JS frameworks like react, offering for more sophisticated development.
