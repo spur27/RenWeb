@@ -1,6 +1,6 @@
 
 <!-- [![RenWeb ~ a FOSS Software SDK](docs/assets/renweb.png)](https://github.com/SpurSlicer/Mauve) -->
-<p style="align: center;">
+<p align="center">
     <a href="https://github.com/SpurSlicer/Mauve">
         <img src="https://github.com/SpurSlicer/RenWeb/blob/main/docs/assets/renweb.png" alt="Renweb ~ A FOSS Software SDK">
     </a>
