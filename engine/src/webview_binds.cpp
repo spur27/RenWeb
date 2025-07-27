@@ -1,14 +1,17 @@
 #include "../include/webview_binds.hpp"
-#include "app.hpp"
-#include "base_rw.hpp"
-#include "config.hpp"
-#include <boost/process/system.hpp>
+#include "info.hpp"
+#include "logger_addons.hpp"
+#include "window.hpp"
+#include <boost/core/ignore_unused.hpp>
 #include <exception>
 #include <filesystem>
-#include <fstream>
 #include <spdlog/spdlog.h>
 #include <sstream>
+#include <stdexcept>
+#include <string>
 #include <system_error>
+#include <uchar.h>
+#include <webview/types.h>
 
 // Surrounds a string with quotes
 std::string jsonStr(std::string str) {
@@ -18,7 +21,7 @@ std::string jsonStr(std::string str) {
 // Removes the surrounding quotes from a JSON dumped string
 std::string jsonDestr(std::string str) {
     return str.substr(1, str.length()-2);
-}
+} 
 
 // Gets JSON contents as a usable std::string
 std::string jsonTostr(json json_v, int indent=-1) {
@@ -36,50 +39,92 @@ std::string jsonLogBindingHandler(const std::string& req) {
     return jsonTostr(param0, 0);
 }
 
+std::vector<char> jsonUint8arrToVec(json json_v) {
+    try {
+        if (!json_v.is_object() && !json_v.is_array()) {
+            throw std::runtime_error(std::string("Variable passed isn't a uint8array and can't be converted to one! A ") + json_v.type_name() + " was recieved.");
+        }
+        size_t n = json_v.size();
+        std::vector<char> buffer(n);
+        for (const auto& [key, value] : json_v.items()) {
+            size_t index = static_cast<size_t>(std::stoul(key));
+            if (index >= n) continue; // Safety check in case of malformed data
+            int val = json_v.value(key, -1);
+            if (val == -1) {
+                throw std::runtime_error("Invalid value in binary string: " + jsonTostr(value));
+            }
+            buffer[index] = static_cast<char>(val);
+        }
+        return buffer;
+    } catch (const std::exception& e) {
+        spdlog::error(e.what());
+        return std::vector<char>();
+    }
+}
+
+
+std::string jsonUint8arrToString(json json_v) {
+    std::vector<char> vec = jsonUint8arrToVec(json_v);
+    if (vec.empty()) return "";
+    else return std::string{vec.begin(), vec.end()};
+}
+
 
 
 // ------------------------------------------------------------
 // ------------------------------------------------------------
 
-void Vanitas::Bindings::Log::bind_logTrace(Vanitas::Webview* w) {
+void RenWeb::Bindings::Log::bind_logTrace(RenWeb::Window* w) {
     const std::string fn_name = "BIND_logTrace";
     w->bindFunction(fn_name, [](const std::string& req) -> std::string {
-        spdlog::trace(jsonLogBindingHandler(req));
+        // (msg: Uint8array)
+        std::string msg = jsonUint8arrToString(json::parse(req)[0]);
+        spdlog::trace("[CLIENT] " + msg);
         return "null";
     });
 }
-void Vanitas::Bindings::Log::bind_logDebug(Vanitas::Webview* w) {
+void RenWeb::Bindings::Log::bind_logDebug(RenWeb::Window* w) {
     const std::string fn_name = "BIND_logDebug";
     w->bindFunction(fn_name, [](const std::string& req) -> std::string {
-        spdlog::debug(jsonLogBindingHandler(req));
+        // (msg: Uint8array)
+        std::string msg = jsonUint8arrToString(json::parse(req)[0]);
+        spdlog::debug("[CLIENT] " + msg);
         return "null";
     });
 }
-void Vanitas::Bindings::Log::bind_logInfo(Vanitas::Webview* w) {
+void RenWeb::Bindings::Log::bind_logInfo(RenWeb::Window* w) {
     const std::string fn_name = "BIND_logInfo";
     w->bindFunction(fn_name, [](const std::string& req) -> std::string {
-        spdlog::info(jsonLogBindingHandler(req));
+        // (msg: Uint8array)
+        std::string msg = jsonUint8arrToString(json::parse(req)[0]);
+        spdlog::info("[CLIENT] " + msg);
         return "null";
     });
 }
-void Vanitas::Bindings::Log::bind_logWarn(Vanitas::Webview* w) {
+void RenWeb::Bindings::Log::bind_logWarn(RenWeb::Window* w) {
     const std::string fn_name = "BIND_logWarn";
     w->bindFunction(fn_name, [](const std::string& req) -> std::string {
-        spdlog::warn(jsonLogBindingHandler(req));
+        // (msg: Uint8array)
+        std::string msg = jsonUint8arrToString(json::parse(req)[0]);
+        spdlog::warn("[CLIENT] " + msg);
         return "null";
     });
 }
-void Vanitas::Bindings::Log::bind_logError(Vanitas::Webview* w) {
+void RenWeb::Bindings::Log::bind_logError(RenWeb::Window* w) {
     const std::string fn_name = "BIND_logError";
     w->bindFunction(fn_name, [](const std::string& req) -> std::string {
-        spdlog::error(jsonLogBindingHandler(req));
+        // (msg: Uint8array)
+        std::string msg = jsonUint8arrToString(json::parse(req)[0]);
+        spdlog::error("[CLIENT] " + msg);
         return "null";
     });
 }
-void Vanitas::Bindings::Log::bind_logCritical(Vanitas::Webview* w) {
+void RenWeb::Bindings::Log::bind_logCritical(RenWeb::Window* w) {
     const std::string fn_name = "BIND_logCritical";
     w->bindFunction(fn_name, [](const std::string& req) -> std::string {
-        spdlog::critical(jsonLogBindingHandler(req));
+        // (msg: Uint8array)
+        std::string msg = jsonUint8arrToString(json::parse(req)[0]);
+        spdlog::critical("[CLIENT] " + msg);
         return "null";
     });
 }
@@ -87,242 +132,490 @@ void Vanitas::Bindings::Log::bind_logCritical(Vanitas::Webview* w) {
 // ------------------------------------------------------------
 // ------------------------------------------------------------
 
-// BROKEN! FILES WITH CERTAIN CHARACTERS (\n) WONT BE PROCESSED
-void Vanitas::Bindings::Filesystem::bind_readFile(Vanitas::Webview* w) {
+void RenWeb::Bindings::Filesystem::bind_readFile(RenWeb::Window* w) {
     const std::string fn_name = "BIND_readFile";
     w->bindFunction(fn_name, [](const std::string& req) -> std::string {
-        json params = json::parse(req);
-        json param0 = params[0];
-        if (param0.is_null()) {
+        // (path: string)
+        std::filesystem::path path (jsonTostr(json::parse(req)[0]));
+        if (!std::filesystem::exists(path)) {
+            spdlog::error("No file exists at " + path.string());
             return "null";
         }
-        std::string param0_str = jsonTostr(param0);
-        if (!std::filesystem::exists(param0_str)) {
-            spdlog::error(std::string("No file exists at path: ") + param0_str);
+        else if (std::filesystem::is_directory(path)) {
+            spdlog::error("readFile can't read directory contents. Use ls for that.");
             return "null";
         }
-        spdlog::debug(std::string("trying to read file of path: ") + param0_str);
-        std::ifstream file;
-        std::ostringstream str;
-        file.open(param0_str);
-        str << file.rdbuf();
+        std::ifstream file(path, std::ios::binary); // open in binary mode
+        if (!file) {
+            spdlog::error("Failed to open file for reading: " + path.string());
+            return "null";
+        }
+        std::vector<char> buffer(std::istreambuf_iterator<char>(file), {});
         file.close();
-        spdlog::debug(jsonStr(str.str()));
-        return jsonStr(str.str());
+        spdlog::debug("Read " + std::to_string(buffer.size()) + " bytes from " + path.string());
+        json uint8arr(buffer);
+        return uint8arr.dump();
     });
 }
-// void Vanitas::Bindings::Filesystem::bind_writeFile(Vanitas::Webview* w) { }
-void Vanitas::Bindings::Filesystem::bind_exists(Vanitas::Webview* w) {
+
+void RenWeb::Bindings::Filesystem::bind_writeFile(RenWeb::Window* w) { 
+    const std::string fn_name = "BIND_writeFile";
+    w->bindFunction(fn_name, [](const std::string& req) -> std::string {
+        // (path: string, contents: Uint8array, settings: {append: boolean=false})
+        json params = json::parse(req);     
+        std::filesystem::path path (jsonTostr(params[0]));
+        std::vector<char> uint8array = (jsonUint8arrToVec(params[1]));
+        bool append = (params[2]["append"].is_boolean() && (params[2]["append"].dump() == "true")) ? true : false;
+        std::ios::openmode mode = std::ios::binary;
+        if (append) {
+            mode |= std::ios::app;
+        } else {
+            mode |= std::ios::trunc;
+        }
+        std::filesystem::path parent_path = path.parent_path();
+        if (std::filesystem::is_directory(path)) {
+            spdlog::error(std::string("Can't write to a directory ") + path.string());
+            return "false";
+        } else if (!std::filesystem::exists(parent_path)) {
+            spdlog::error(std::string("Directory '") + parent_path.string() + "' doesn't exist.");
+            return "false";
+        }
+        std::ofstream file(path, mode);
+        if (file.bad()) {
+            spdlog::error(std::string("Bad file ") + path.string());
+            return "false";
+        }
+        if (uint8array.empty()) {
+            spdlog::debug("Input content empty. Attempting empty write");
+        }
+        file.write(uint8array.data(), uint8array.size());
+        file.close();
+        spdlog::debug(((append) ? "Appended " : "Wrote ") + std::to_string(uint8array.size()) + " bytes to " + path.string());
+        return "true";
+    });
+}
+void RenWeb::Bindings::Filesystem::bind_exists(RenWeb::Window* w) {
     const std::string fn_name = "BIND_exists";
     w->bindFunction(fn_name, [](const std::string& req) -> std::string {
-        json params = json::parse(req);
-        json param0 = params[0];
-        std::string param0_str = jsonTostr(param0);
-        if (std::filesystem::exists(param0_str)) {
-            return "true";
-        } else {
-            return "false";
-        }
+        // (path: string)
+        std::filesystem::path path (jsonTostr(json::parse(req)[0]));
+        return (std::filesystem::exists(path)) ? "true" : "false";
     });
 }
-void Vanitas::Bindings::Filesystem::bind_mkDir(Vanitas::Webview* w) {
+void RenWeb::Bindings::Filesystem::bind_isDir(RenWeb::Window* w) {
+    const std::string fn_name = "BIND_isDir";
+    w->bindFunction(fn_name, [](const std::string& req) -> std::string {
+        // (path: string)
+        std::filesystem::path path (jsonTostr(json::parse(req)[0]));
+        return (std::filesystem::is_directory(path)) ? "true" : "false";
+    });
+}
+void RenWeb::Bindings::Filesystem::bind_mkDir(RenWeb::Window* w) {
     const std::string fn_name = "BIND_mkDir";
     w->bindFunction(fn_name, [](const std::string& req) -> std::string {
-        json params = json::parse(req);
-        json param0 = params[0];
-        std::string param0_str = jsonTostr(param0);
+        // (path: string)
+        std::filesystem::path path (jsonTostr(json::parse(req)[0]));
+        if (std::filesystem::exists(path)) {
+            spdlog::error("File/dir already exists at '" + path.string() + "'");
+            return "false";
+        }
         std::error_code ec;
-        bool result = std::filesystem::create_directory(param0_str, ec);
-        if (result) {
-            return "true";
-        } else {
+        std::filesystem::create_directory(path, ec);
+        if (ec) {
             spdlog::error(ec.message());
             return "false";
+        } else {
+            return "true";
         }
     });
 }
-void Vanitas::Bindings::Filesystem::bind_rmDir(Vanitas::Webview* w) {
-    const std::string fn_name = "BIND_rmDir";
+void RenWeb::Bindings::Filesystem::bind_rm(RenWeb::Window* w) {
+    const std::string fn_name = "BIND_rm";
     w->bindFunction(fn_name, [](const std::string& req) -> std::string {
-        json params = json::parse(req);
-        json param0 = params[0];
-        std::string param0_str = jsonTostr(param0);
+        // (path: string, settings: {recursive: boolean=false})
+        json params = json::parse(req);     
+        std::filesystem::path path (jsonTostr(params[0]));
+        bool recursive = (params[1]["recursive"].is_boolean() && (params[1]["recursive"].dump() == "true")) ? true : false;
         std::error_code ec;
-        bool result = std::filesystem::remove(param0_str, ec);
-        if (result) {
-            return "true";
-        } else {
+        if (!std::filesystem::exists(path)) {
+            spdlog::error("Cannot delete file/dir that doesn't exist: " + path.string());
+            return "false";
+        } else if (std::filesystem::is_directory(path)) {
+            if (recursive) {
+                std::filesystem::remove_all(path, ec);
+            } else {
+                std::filesystem::remove(path, ec);
+            }
+            if (ec) {
+                spdlog::error(ec.message());
+                return "false";
+            } else {
+                return "true";
+            }
+        }
+        std::filesystem::remove(path, ec);
+        if (ec) {
             spdlog::error(ec.message());
             return "false";
+        } else {
+            return "true";
         }
     });
 }
-void Vanitas::Bindings::Filesystem::bind_ls(Vanitas::Webview* w) {
+void RenWeb::Bindings::Filesystem::bind_ls(RenWeb::Window* w) {
     const std::string fn_name = "BIND_ls";
     w->bindFunction(fn_name, [](const std::string& req) -> std::string {
-        json params = json::parse(req);
-        json param0 = params[0];
-        std::string param0_str = jsonTostr(param0);
-        if (!std::filesystem::is_directory(param0_str)) {
-            spdlog::error("Entered path either isn't a directory or doesn't exist:");
-            spdlog::error(param0_str);
+        // (path: string)
+        std::filesystem::path path (jsonTostr(json::parse(req)[0]));
+        if (!std::filesystem::is_directory(path)) {
+            spdlog::error("Path entered to ls wasn't a dir: " + path.string());
             return "null";
         }
         std::error_code ec;
         json array = json::array();
-        int index = 0;
-        for (const auto& entry : std::filesystem::directory_iterator(param0_str)) {
-            array[index] = entry.path();
-            index++;
+        for (const auto& entry : std::filesystem::directory_iterator(path, ec)) {
+            array.push_back(entry.path().string());
         }
-        return array.dump();
+        if (ec) {
+            spdlog::error(ec.message());
+            return "null";
+        } else {
+            return array.dump();
+        }
     });
 }
-// void bind_rename(Vanitas::Webview*);
-// void bind_move(Vanitas::Webview*);
-// void bind_copyFile(Vanitas::Webview*);
+void RenWeb::Bindings::Filesystem::bind_rename(RenWeb::Window* w) {
+    const std::string fn_name = "BIND_rename";
+    w->bindFunction(fn_name, [](const std::string& req) -> std::string {
+        // (orig_path: string, new_path: string, settings: {overwrite: boolean=false})
+        json params = json::parse(req);     
+        std::filesystem::path orig_path (jsonTostr(params[0]));
+        std::filesystem::path new_path (jsonTostr(params[1]));
+        bool overwrite = (params[2]["overwrite"].is_boolean() && (params[2]["overwrite"].dump() == "true")) ? true : false;
+        std::error_code ec;
+        if (!std::filesystem::exists(orig_path)) {
+            spdlog::error("Can't rename path that doesn't exist: " + orig_path.string());
+            return "null";
+        } else if (std::filesystem::exists(new_path) && !overwrite) {
+            spdlog::error("Can't overwrite already-existing new path if settings.overwrite is false: " + new_path.string());
+            return "null";
+        } else if (std::filesystem::exists(new_path)) {
+            if (std::filesystem::is_directory(new_path)) {
+                std::filesystem::remove_all(new_path, ec);
+            } else {
+                std::filesystem::remove(new_path, ec);
+            }
+            if (ec) {
+                spdlog::error(ec.message());
+                return "false";
+            }
+        }
+        std::filesystem::rename(orig_path, new_path, ec);
+        if (ec) {
+            spdlog::error(ec.message());
+            return "false";
+        } else {
+            return "true";
+        }
+    });
+}
+void RenWeb::Bindings::Filesystem::bind_copy(RenWeb::Window* w) {
+    const std::string fn_name = "BIND_copy";
+    w->bindFunction(fn_name, [](const std::string& req) -> std::string {
+        // (orig_path: string, new_path: string, settings: {overwrite: boolean=false})
+        json params = json::parse(req);     
+        std::filesystem::path orig_path (jsonTostr(params[0]));
+        std::filesystem::path new_path (jsonTostr(params[1]));
+        bool overwrite = (params[2]["overwrite"].is_boolean() && (params[2]["overwrite"].dump() == "true")) ? true : false;
+        std::error_code ec;
+        if (!std::filesystem::exists(orig_path)) {
+            spdlog::error("Can't copy path that doesn't exist: " + orig_path.string());
+            return "null";
+        } else if (std::filesystem::exists(new_path) && !overwrite) {
+            spdlog::error("Can't overwrite already-existing new path if settings.overwrite is false: " + new_path.string());
+            return "null";
+        } else if (std::filesystem::exists(new_path)) {
+            if (std::filesystem::is_directory(new_path)) {
+                std::filesystem::remove_all(new_path, ec);
+            } else {
+                std::filesystem::remove(new_path, ec);
+            }
+            if (ec) {
+                spdlog::error(ec.message());
+                return "false";
+            }
+        }
+        if (std::filesystem::is_directory(orig_path)) {
+            std::filesystem::copy(orig_path, new_path, std::filesystem::copy_options::recursive, ec);
+        } else {
+            std::filesystem::copy(orig_path, new_path, ec);
+        }
+        if (ec) {
+            spdlog::error(ec.message());
+            return "false";
+        } else {
+            return "true";
+        }
+    });
+}
+void RenWeb::Bindings::Filesystem::bind_chooseFiles(RenWeb::Window* w) {
+    const std::string fn_name = "BIND_chooseFiles";
+    w->bindFunction(fn_name, [w](const std::string& req) -> std::string {
+        // ({multiple: boolean, dirs: boolean, (patterns | mimes): [name: string, rules: string[]]})
+        json settings = (json::parse(req)[0]);
+        std::vector<std::string> filepaths;
+        if (settings.is_object()) {
+            bool multi = false;
+            bool dir = false;
+            multi = settings.value("multiple", false);
+            dir = settings.value("dirs", false);
+            spdlog::info("multiple: " + std::to_string(multi) + " dirs: " + std::to_string(dir));
+            RenWeb::ChooseFileDialogSettings* filteration = nullptr;
+            json filter_arr;
+            auto set_filters = [&](const std::string filter_name){
+                if ((filter_arr = settings[filter_name]).is_array()) {
+                    if (filteration == nullptr) filteration = new ChooseFileDialogSettings();
+                    for (auto& i : filter_arr) {
+                        if (i.is_array() && i[1].is_array()) {
+                            auto filter_pair = std::make_pair<std::string, std::vector<std::string>>(jsonTostr(i[0]), {});
+                            for (auto& j : i[1]) {
+                                filter_pair.second.push_back(jsonTostr(j));
+                            }
+                            filteration->patterns.push_back(filter_pair);
+                        }
+                    }
+                }
+            };
+            set_filters("patterns");
+            set_filters("mimes");
+            filepaths = w->openChooseFilesDialog(multi, dir, filteration);
+            if (filteration != nullptr) delete filteration;
+        } else {
+            filepaths = w->openChooseFilesDialog();
+        }
+        if (filepaths.empty()) {
+            spdlog::info("It seems no file was chosen");
+            return "null";
+        }
+        json filenames_arr = json::array();
+        for (auto& i : filepaths) {
+            filenames_arr.push_back(i);
+        }
+        return filenames_arr.dump();
+    });
+}
 
 
 // ------------------------------------------------------------
 // ------------------------------------------------------------
 
-void Vanitas::Bindings::Webview::bind_saveSettings(Vanitas::Webview* w) {
+void RenWeb::Bindings::Webview::bind_saveSettings(RenWeb::Window* w) {
     const std::string fn_name = "BIND_saveSettings";
     w->bindFunction(fn_name, [w](const std::string& req) -> std::string {
-        (void)req;
-        w->info->save();
+        // ()
+        boost::ignore_unused(req);
+        RenWeb::Info::App::save();
         return "null";
     });
 }
-// void bind_setSettings(Vanitas::Webview* w);
-void Vanitas::Bindings::Webview::bind_readSettings(Vanitas::Webview* w) {
-    const std::string fn_name = "BIND_readSettings";
+void RenWeb::Bindings::Webview::bind_refreshSettings(RenWeb::Window* w) {
+    const std::string fn_name = "BIND_refreshSettings";
     w->bindFunction(fn_name, [w](const std::string& req) -> std::string {
-        (void)req;
-        return Vanitas::Config::getSettings(w->info->html_doc_name).dump(2);
+        // ()
+        boost::ignore_unused(req);
+        w->refreshSettings();
+        return "null";
     });
 }
-void Vanitas::Bindings::Webview::bind_setHTML(Vanitas::Webview* w) {
-    const std::string fn_name = "BIND_setHTML";
+void RenWeb::Bindings::Webview::bind_reloadPage(RenWeb::Window* w) {
+    const std::string fn_name = "BIND_reloadPage";
     w->bindFunction(fn_name, [w](const std::string& req) -> std::string {
-        json params = json::parse(req);
-        json param0 = params[0];
-        if (param0.is_string()) {
-            std::string param0_str = param0.dump();
-            w->setHTML(param0.dump().substr(1, param0_str.length()-2));
+        // ()
+        boost::ignore_unused(req);
+        w->reloadPage();
+        return "null";
+    });
+}
+
+void RenWeb::Bindings::Webview::bind_setSettings(RenWeb::Window* w) {
+    const std::string fn_name = "BIND_setSettings";
+    w->bindFunction(fn_name, [w](const std::string& req) -> std::string {
+        // (settings: (Settings & {})
+        json settings = json::parse(req)[0];
+        if (settings.is_object()) {
+            RenWeb::Info::App::set(std::move(settings));
         } else {
-            w->setTitle(param0.dump());
+            spdlog::error(std::string("An object is required to set settings. Recieved ") + settings.type_name());
         }
         return "null";
-    }); 
+    });
 }
-void Vanitas::Bindings::Webview::bind_setHTMLToDoc(Vanitas::Webview* w) {
-    const std::string fn_name = "BIND_setHTMLToDoc";
+void RenWeb::Bindings::Webview::bind_getSettings(RenWeb::Window* w) {
+    const std::string fn_name = "BIND_getSettings";
+    w->bindFunction(fn_name, [](const std::string& req) -> std::string {
+        // ()
+        boost::ignore_unused(req);
+        return RenWeb::Info::App::get().dump(2);
+    });
+}
+void RenWeb::Bindings::Webview::bind_resetSettingsToDefaults(RenWeb::Window* w) {
+    const std::string fn_name = "BIND_resetSettingsToDefaults";
     w->bindFunction(fn_name, [w](const std::string& req) -> std::string {
-        json params = json::parse(req);
-        json param0 = params[0];
-        json param1 = params[1];
-        std::string param0_str = param0.dump();
-        if (param0.is_string()) {
-            param0_str = param0_str.substr(1, param0_str.length()-2);
-        }
-        w->setHTMLToFile(param0_str);
-        if (param1.is_boolean() && (param1.dump() == "true")) {
-            w->info->html_doc_name = param0_str;
-            w->info->refresh();
-            w->refreshTitle();
-            // attempt to set size
-            w->refreshSize();
-        }
+        // ()
+        boost::ignore_unused(req);
+        RenWeb::Info::App::resetToDefaults();
+        // w->refreshSettings();
         return "null";
-    }); 
+    });
 }
-void Vanitas::Bindings::Webview::bind_setSize(Vanitas::Webview* w) {
-    const std::string fn_name = "BIND_setSize";
-    w->bindFunction(fn_name, [/*w*/](const std::string& req) -> std::string {
-        json params = json::parse(req);
-        json param0 = params[0];
-        json param1 = params[1];
-        json param2 = params[2];
-        // if (param0.is_string()) {
-        //     std::string param0_str = param0.dump();
-        //     w->setTitle(param0.dump().substr(1, param0_str.length()-2));
-        // } else {
-        //     w->setTitle(param0.dump());
-        // }
-        return "null";
-    }); 
-}
-void Vanitas::Bindings::Webview::bind_setTitle(Vanitas::Webview* w) {
-    const std::string fn_name = "BIND_setTitle";
+
+void RenWeb::Bindings::Webview::bind_updateSize(RenWeb::Window* w) {
+    const std::string fn_name = "BIND_updateSize";
     w->bindFunction(fn_name, [w](const std::string& req) -> std::string {
+        // (force: boolean=false)
         json params = json::parse(req);
-        json param0 = params[0];
-        if (param0.is_string()) {
-            std::string param0_str = param0.dump();
-            w->setTitle(param0.dump().substr(1, param0_str.length()-2));
-        } else {
-            w->setTitle(param0.dump());
-        }
+        bool forced = (params[0].is_boolean() && (params[0].dump() == "true")) ? true : false;
+        w->updateSize(forced);
         return "null";
     }); 
 }
-void Vanitas::Bindings::Webview::bind_terminate(Vanitas::Webview* w) {
-    const std::string fn_name = "BIND_terminate";
+
+void RenWeb::Bindings::Webview::bind_close(RenWeb::Window* w) {
+    const std::string fn_name = "BIND_close";
     w->bindFunction(fn_name, [w](const std::string& req) -> std::string {
-        (void)req;
+        // ()
+        boost::ignore_unused(req);
         w->terminateWindow();
         return "null";
     }); 
 }
-void Vanitas::Bindings::Webview::bind_openWindow(Vanitas::Webview* w) {
+
+void RenWeb::Bindings::Webview::bind_openWindow(RenWeb::Window* w) {
     const std::string fn_name = "BIND_openWindow";
-    w->bindFunction(fn_name, [](const std::string& req) -> std::string {
+    w->bindFunction(fn_name, [w](const std::string& req) -> std::string {
+        // (uri: string="_", settings: {single: boolean=false})
         json params = json::parse(req);
-        json param0 = params[0];
-        spdlog::info(std::filesystem::current_path().string());
-        boost::process::child* c;
-        if (param0.is_null()) {
-            spdlog::debug("Attempting to start duplicate process...");
-            c = new boost::process::child("/home/spur/Programming/Frameworks/Vanitas/van_engine/build/debug/van_engine");
-            Vanitas::App::addChild(std::string(MAIN_HTML_DOC_NAME) + " " + std::to_string(c->id()), c);
-        } else {
-            std::string param0_str = param0.dump();
-            if (param0.is_string()) {
-                param0_str = param0_str.substr(1, param0_str.length()-2);
+        std::string uri = jsonTostr(params[0]);
+        bool single = (params[1]["single"].is_boolean() && (params[1]["single"].dump() == "true")) ? true : false;
+        if (uri.empty() || (uri == "_")) {
+            spdlog::debug(std::string("Attempting to start duplicate process. Single? ") + ((single) ? "true" : "false"));
+            uri = RenWeb::Info::App::page;
+        }
+        if (single) {
+            if (!w->process_manager.hasProcess(uri)) {
+                spdlog::debug("Attempting to start single process for uri '" + uri + "'");
+                w->process_manager.startProcess(uri);
+            } else {
+                spdlog::debug("Process of name '" + uri + "' is already running. Bringing it to foreground...");
+                w->process_manager.bringToForeground(uri);
             }
-            spdlog::debug("Attempting to start process for HTML doc '" + param0_str + "'");
-            c = new boost::process::child("/home/spur/Programming/Frameworks/Vanitas/van_engine/build/debug/van_engine", param0_str);
-            Vanitas::App::addChild(param0_str, c);
+        } else {
+            spdlog::debug("Attempting to start process for uri '" + uri + "'");
+            w->process_manager.startProcess(uri);
         }
         return "null";
     }); 
 }
-
-
+void RenWeb::Bindings::Webview::bind_minimize(RenWeb::Window* w) {
+    const std::string fn_name = "BIND_minimize";
+    w->bindFunction(fn_name, [w](const std::string& req) -> std::string {
+        // ()
+        boost::ignore_unused(req);
+        w->minimize();
+        return "null";
+    }); 
+}
+void RenWeb::Bindings::Webview::bind_maximize(RenWeb::Window* w) {
+    const std::string fn_name = "BIND_maximize";
+    w->bindFunction(fn_name, [w](const std::string& req) -> std::string {
+        // ()
+        boost::ignore_unused(req);
+        w->maximize();
+        return "null";
+    }); 
+}
+void RenWeb::Bindings::Webview::bind_fullscreen(RenWeb::Window* w) {
+    const std::string fn_name = "BIND_fullscreen";
+    w->bindFunction(fn_name, [w](const std::string& req) -> std::string {
+        // ()
+        boost::ignore_unused(req);
+        w->fullscreen();
+        return "null";
+    }); 
+}
+void RenWeb::Bindings::Webview::bind_hide(RenWeb::Window* w) {
+    const std::string fn_name = "BIND_hide";
+    w->bindFunction(fn_name, [w](const std::string& req) -> std::string {
+        // ()
+        boost::ignore_unused(req);
+        w->hide();
+        return "null";
+    }); 
+}
+void RenWeb::Bindings::Webview::bind_show(RenWeb::Window* w) {
+    const std::string fn_name = "BIND_show";
+    w->bindFunction(fn_name, [w](const std::string& req) -> std::string {
+        // ()
+        boost::ignore_unused(req);
+        w->show();
+        return "null";
+    }); 
+}
 // ------------------------------------------------------------
 // ------------------------------------------------------------
 
-void Vanitas::Bindings::Util::bind_getPID(Vanitas::Webview* w) {
+void RenWeb::Bindings::Util::bind_getPID(RenWeb::Window* w) {
     const std::string fn_name = "BIND_getPID";
     w->bindFunction(fn_name, [](const std::string& req) -> std::string {
-        (void)req;
+        // ()
+        boost::ignore_unused(req);
         return std::to_string(getpid());
     });
 }
 
-void Vanitas::Bindings::Util::bind_getApplicationDirPath(Vanitas::Webview* w) {
+void RenWeb::Bindings::Util::bind_getApplicationDirPath(RenWeb::Window* w) {
     const std::string fn_name = "BIND_getApplicationDirPath";
     w->bindFunction(fn_name, [](const std::string& req) -> std::string {
-        (void)req;
-        return jsonStr(Vanitas::BaseRW::getApplicationDirPath());
+        // ()
+        boost::ignore_unused(req);
+        return jsonStr(RenWeb::Info::File::dir);
     });
 }
 
-void Vanitas::Bindings::Util::bind_getHTMLDocName(Vanitas::Webview* w) {
-    const std::string fn_name = "BIND_getHTMLDocName";
-    w->bindFunction(fn_name, [w](const std::string& req) -> std::string {
-        (void)req;
-        return jsonStr(w->info->html_doc_name);
-    });
+void RenWeb::Bindings::bind_all(RenWeb::Window* w) {
+    RenWeb::Bindings::Log::bind_logTrace(w);
+    RenWeb::Bindings::Log::bind_logDebug(w);
+    RenWeb::Bindings::Log::bind_logInfo(w);
+    RenWeb::Bindings::Log::bind_logWarn(w);
+    RenWeb::Bindings::Log::bind_logError(w);
+    RenWeb::Bindings::Log::bind_logCritical(w);
+
+    RenWeb::Bindings::Filesystem::bind_readFile(w);
+    RenWeb::Bindings::Filesystem::bind_writeFile(w);
+    RenWeb::Bindings::Filesystem::bind_exists(w);
+    RenWeb::Bindings::Filesystem::bind_isDir(w);
+    RenWeb::Bindings::Filesystem::bind_mkDir(w);
+    RenWeb::Bindings::Filesystem::bind_rm(w);
+    RenWeb::Bindings::Filesystem::bind_ls(w);
+    RenWeb::Bindings::Filesystem::bind_rename(w);
+    RenWeb::Bindings::Filesystem::bind_copy(w);
+    RenWeb::Bindings::Filesystem::bind_chooseFiles(w);
+
+    RenWeb::Bindings::Webview::bind_saveSettings(w);
+    RenWeb::Bindings::Webview::bind_refreshSettings(w);
+    RenWeb::Bindings::Webview::bind_reloadPage(w);
+    RenWeb::Bindings::Webview::bind_setSettings(w);
+    RenWeb::Bindings::Webview::bind_getSettings(w);
+    RenWeb::Bindings::Webview::bind_resetSettingsToDefaults(w);
+    RenWeb::Bindings::Webview::bind_updateSize(w);
+    RenWeb::Bindings::Webview::bind_close(w);
+    RenWeb::Bindings::Webview::bind_openWindow(w);
+    RenWeb::Bindings::Webview::bind_minimize(w);
+    RenWeb::Bindings::Webview::bind_maximize(w);
+    RenWeb::Bindings::Webview::bind_fullscreen(w);
+    RenWeb::Bindings::Webview::bind_hide(w);
+    RenWeb::Bindings::Webview::bind_show(w);
+
+    RenWeb::Bindings::Util::bind_getPID(w);
+    RenWeb::Bindings::Util::bind_getApplicationDirPath(w);
 }

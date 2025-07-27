@@ -1,7 +1,11 @@
 .sconsign.dblite
+compile_commands.json
 *.o
+*.d
 build
+.build
 .cache
+libs.log
 node_modules
 package-lock.json
 dist

@@ -1,45 +1,54 @@
-#include "webview.hpp"
+#ifndef RENWEB_WEBVIEW_BINDS_H
+#define RENWEB_WEBVIEW_BINDS_H
+#include "window.hpp"
 #include <nlohmann/json.hpp>
 #include <boost/process.hpp>
 
 using json = nlohmann::json;
 
-namespace Vanitas {
+namespace RenWeb {
     namespace Bindings {
         namespace Log {
-            void bind_logTrace(Vanitas::Webview*);
-            void bind_logDebug(Vanitas::Webview*);
-            void bind_logInfo(Vanitas::Webview*);
-            void bind_logWarn(Vanitas::Webview*);
-            void bind_logError(Vanitas::Webview*);
-            void bind_logCritical(Vanitas::Webview*);
+            void bind_logTrace(RenWeb::Window*);
+            void bind_logDebug(RenWeb::Window*);
+            void bind_logInfo(RenWeb::Window*);
+            void bind_logWarn(RenWeb::Window*);
+            void bind_logError(RenWeb::Window*);
+            void bind_logCritical(RenWeb::Window*);
         }
         namespace Filesystem {
-            void bind_readFile(Vanitas::Webview*);
-            // void bind_writeFile(Vanitas::Webview*);
-            void bind_exists(Vanitas::Webview*);
-            void bind_mkDir(Vanitas::Webview*);
-            void bind_rmDir(Vanitas::Webview*);
-            void bind_ls(Vanitas::Webview*);
-            void bind_rename(Vanitas::Webview*);
-            void bind_move(Vanitas::Webview*);
-            void bind_copyFile(Vanitas::Webview*);
+            void bind_readFile(RenWeb::Window*);
+            void bind_writeFile(RenWeb::Window*);
+            void bind_exists(RenWeb::Window*);
+            void bind_isDir(RenWeb::Window*);
+            void bind_mkDir(RenWeb::Window*);
+            void bind_rm(RenWeb::Window*);
+            void bind_ls(RenWeb::Window*);
+            void bind_rename(RenWeb::Window*);
+            void bind_copy(RenWeb::Window*);
+            void bind_chooseFiles(RenWeb::Window*);
         }
         namespace Webview {
-            void bind_saveSettings(Vanitas::Webview*);
-            // void bind_setSettings(Vanitas::Webview*);
-            void bind_readSettings(Vanitas::Webview*);
-            void bind_setHTML(Vanitas::Webview*);
-            void bind_setHTMLToDoc(Vanitas::Webview*);
-            void bind_setSize(Vanitas::Webview*);
-            void bind_setTitle(Vanitas::Webview*);
-            void bind_terminate(Vanitas::Webview*);
-            void bind_openWindow(Vanitas::Webview*);
+            void bind_saveSettings(RenWeb::Window*);
+            void bind_refreshSettings(RenWeb::Window*);
+            void bind_reloadPage(RenWeb::Window*);
+            void bind_setSettings(RenWeb::Window*);
+            void bind_getSettings(RenWeb::Window*);
+            void bind_resetSettingsToDefaults(RenWeb::Window*);
+            void bind_updateSize(RenWeb::Window*);
+            void bind_close(RenWeb::Window*);
+            void bind_openWindow(RenWeb::Window*);
+            void bind_minimize(RenWeb::Window*);
+            void bind_maximize(RenWeb::Window*);
+            void bind_fullscreen(RenWeb::Window*);
+            void bind_hide(RenWeb::Window*);
+            void bind_show(RenWeb::Window*);
         }
         namespace Util {
-            void bind_getPID(Vanitas::Webview*);
-            void bind_getApplicationDirPath(Vanitas::Webview*);
-            void bind_getHTMLDocName(Vanitas::Webview*);
+            void bind_getPID(RenWeb::Window*);
+            void bind_getApplicationDirPath(RenWeb::Window*);
         }
+        void bind_all(RenWeb::Window*);
     }
 }
+#endif

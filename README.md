@@ -1,15 +1,52 @@
 
-# WIP!!
-This project is extremely early in development!! The engine has it's subprocess hierarchy drafted. Much is to be done! It's on github right now as a backup.
+[![RenWeb ~ a FOSS Software SDK](docs/assets/renweb.png)](https://github.com/SpurSlicer/Mauve)
+<!-- <p style="align: center;">
+    <a href="https://github.com/SpurSlicer/Mauve">
+        <img src="/docs/assets/renweb.png" alt="Renweb ~ A FOSS Software SDK">
+    </a>
+</p> -->
 
-## engine
-- Do webserver boostbeast overhaul
-- Rework process hierarchy
-- Modify logging format to match scripts
-- Make relative dir stuff work
+(*Worflow badges will go here*)
 
-## webpacking
-- Further adjust once webserver overhaul is done
+- [Intro to Ren Web](#intro-to-ren-web)
+- [Building](#building)
+  - [Linux](#linux)
+  - [MacOS](#macos)
+  - [Windows](#windows)
+- [Server Design](#server-design)
+  - [Passing Arguments](#passing-arguments)
+  - [Info](#info)
+  - [Logging](#logging)
+  - [Web Server](#web-server)
+  - [Windows](#windows-1)
+- [Client Design](#client-design)
+  - [Vanilla](#vanilla)
+  - [Node](#node)
+- [Limitations](#limitations)
+- [Planned Additions](#planned-additions)
+- [Credits](#credits)
+- [License](#license)
 
-## project
-- Make more npm scripts and give them flags
+
+## Intro to Ren Web
+## Building
+### Linux
+### MacOS
+### Windows
+
+## Server Design
+### Passing Arguments
+### Info
+### Logging
+### Web Server
+### Windows
+
+## Client Design
+### Vanilla
+### Node
+
+## Limitations
+## Planned Additions
+
+## Credits
+## License

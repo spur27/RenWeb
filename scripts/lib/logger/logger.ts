@@ -1,29 +1,29 @@
 import Chalk from 'chalk';
-import { appendFileSync, existsSync, mkdirSync, PathLike, writeFileSync } from 'fs';
+import { appendFileSync, existsSync, mkdirSync, writeFileSync } from 'fs';
 import Path from 'path';
 
-export enum LogLevel {
-    CRITICAL=0,
-    ERROR=1,
-    WARN=2,
-    INFO=3,
-    DEBUG=4,
-    TRACE=5
-};
+export const LogLevel = Object.freeze({
+    CRITICAL: 0,
+    ERROR: 1,
+    WARN: 2,
+    INFO: 3,
+    DEBUG: 4,
+    TRACE: 5
+});
 
 export class Logger {
     private readonly script_name;
     private readonly color_fn;
     private get getDate() { return new Date().toISOString().replace("T", " ").replace("Z", ""); }
     private log_to_file: boolean;
-    private log_level: LogLevel;
+    private log_level: number;
     private log_file_path: string;
     public get getLogLevel() { return this.log_level; }
-    public set setLogLevel(log_level: LogLevel) { this.log_level = log_level; }
+    public set setLogLevel(log_level: number) { this.log_level = log_level; }
 
-    constructor(script_name: string, log_to_file=false, log_level=LogLevel.DEBUG, color?: (...args: any[]) => {}) {
+    constructor(script_name: string, log_to_file=false, log_level: number=LogLevel.DEBUG, color?: (...args: any[]) => {}) {
         this.script_name = script_name;
-        this.log_file_path = Path.join(import.meta.dirname, `../../../../build/log_${this.script_name.trim().toLocaleLowerCase().replace(/\s/, "_")}.txt`);
+        this.log_file_path = Path.join(import.meta.dirname, `../../../build/log_${this.script_name.trim().toLocaleLowerCase().replace(/\s/, "_")}.txt`);
         this.log_to_file = log_to_file;
         this.log_level = log_level;
         if (color != null && color != undefined) {
@@ -38,8 +38,8 @@ export class Logger {
             writeFileSync(this.log_file_path, "");
         }
     }
-    private log(msg: any, log_type: LogLevel) {
-        const [log_text, log_text_colored] = ((log_type: LogLevel) => {
+    private log(msg: any, log_type: number) {
+        const [log_text, log_text_colored] = ((log_type: number) => {
             switch (log_type) {
                 case LogLevel.CRITICAL:
                     return ["CRITICAL", Chalk.bold.bgRed.white("CRITICAL")];
