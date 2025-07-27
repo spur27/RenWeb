@@ -4,7 +4,7 @@
     <a href="https://github.com/SpurSlicer/Mauve">
         <img src="https://github.com/SpurSlicer/RenWeb/blob/main/docs/assets/renweb.png" alt="Renweb ~ A FOSS Software SDK">
     </a>
-    <p>va0.0.1</p>
+    <p style="text-align: center">va0.0.1</p>
 </p>
 
 (*Worflow badges will go here*)
