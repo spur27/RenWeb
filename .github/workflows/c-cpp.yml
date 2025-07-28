@@ -13,9 +13,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: cd to ./engine
-      run: cd engine
-    - name: ls
-      run: ls
+    - name: make
+      run: make
+      working-directory: ./engine
     # - name: make
     #   run: make
