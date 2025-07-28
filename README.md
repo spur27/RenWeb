@@ -6,7 +6,7 @@
     </a>
 </p>
 
-(*Worflow badges will go here*)
+<!-- (*Worflow badges will go here*) -->
 
 - [Introduction](#introduction)
 - [Compilation](#compilation)
@@ -281,6 +281,7 @@ To edit the build script, you can find it at <a href="./scripts//src/build.ts">.
 - <a href="./package.json">./package.json</a> is the package.json that should contain UI node modules.
 
 ## Planned Additions
+- Add github submodule support
 - Support for angular and vue (currently untested)
 - Support for Mac and Window
 - An npm script to generate installers for each OS
