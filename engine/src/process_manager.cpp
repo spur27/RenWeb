@@ -139,8 +139,7 @@ void RenWeb::ProcessManager::bringToForeground(std::string process_name) {
         [appleScript executeAndReturnError:&errorInfo];
         [appleScript release];
 #elif defined(__linux__)
-        // Linux (GTK3): Use xdotool to bring window of given PID to foreground
-        boost::process::system("/usr/bin/xdotool", "search", "--pid", std::to_string(child_pid), "windowactivate");
+    spdlog::critical("bringToForefround is UNIMPLEMENTED");
 #endif
     } catch (const std::exception& e) {
         spdlog::error(e.what());

@@ -5,8 +5,6 @@ const DEFAULT_INDENT = 2;
 * -----------------------------------------------
 */ 
 export function sync(fn: (...args: []) => Promise<{}>, ...args: []): {} { return (async (args: []) => { return await fn(...args); })(args); }
-export namespace Constants {
-}
 export namespace Log {
     export type Settings = {
         indent: number
