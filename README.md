@@ -207,7 +207,7 @@ RenWeb has the ability to run multiple pages at once. When it does this, the ori
 In addition to this, every normal 1-window process has the ability to create and manage subwindows/subprocesses in the same tree-like fashion:
 
 <p align="center">
-        <img height=200 src="https://github.com/SpurSlicer/RenWeb/blob/main/docs/assets/subprocesses.png" alt="A tree diagram showing how subwindows work">
+        <img height=300 src="https://github.com/SpurSlicer/RenWeb/blob/main/docs/assets/subprocesses.png" alt="A tree diagram showing how subwindows work">
 </p>
 
 Subwindows can also be set to be `single` which makes it so that only one instance of that page can ever be active at once. See the Client Design section for more information. Note that subwindows don't *know* that they're single; the process manager that invokes the subwindow is what keeps track of singleness.
