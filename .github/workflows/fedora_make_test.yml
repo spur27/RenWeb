@@ -13,40 +13,40 @@ jobs:
       image: fedora:39
 
     steps:
-      - name: Install image dependencies
-        run: |
-          dnf install -y git gcovr
-          dnf module enable -y nodejs:18
-          dnf install -y nodejs
+    - name: Install image dependencies
+      run: |
+        dnf install -y git gcovr
+        dnf module enable -y nodejs:18
+        dnf install -y nodejs
 
-      - name: checkout
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
+    - name: checkout
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
 
-      - name: npm install UI packages
-        run: npm i
+    - name: npm install UI packages
+      run: npm i
 
-      - name: npm install webpack packages
-        run: npm i
-        working-directory: ./scripts
+    - name: npm install webpack packages
+      run: npm i
+      working-directory: ./scripts
 
-      - name: compile source libs
-        run: npx tsc
-        working-directory: ./src
+    - name: compile source libs
+      run: npx tsc
+      working-directory: ./src
 
-      - name: install dependencies
-        run: |
-            dnf update -y
-            dnf install -y \
-              make gcc gcc-c++ glibc-devel \ 
-              gtk3-devel \
-              webkit2gtk4.1-devel \
-              libgtk-3-0 \
-              webkit2gtk4.1 \
-              pkgconf-pkg-config \
-              boost-devel
+    - name: install dependencies
+      run: |
+          dnf update -y
+          dnf install -y \
+            make gcc gcc-c++ glibc-devel \ 
+            gtk3-devel \
+            webkit2gtk4.1-devel \
+            libgtk-3-0 \
+            webkit2gtk4.1 \
+            pkgconf-pkg-config \
+            boost-devel
 
-      - name: make
-        run: make run
-        working-directory: ./engine
+    - name: make
+      run: make run
+      working-directory: ./engine
