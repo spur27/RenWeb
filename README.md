@@ -83,7 +83,7 @@ Now, install the required technologies to compile the executable
   - `dnf install gtk3-devel webkit2gtk4.1-devel`
   - `dnf install gtk3 webkit2gtk4.1`
   - `dnf install pkgconf-pkg-config`
-  - `dnf install boost-devel boost`
+  - `dnf install boost-devel boost-url`
 - **Other:**
   - *Download and install* <a href="">gtk3</a>
   - *Download and install* <a href="">webkit2</a>
@@ -298,7 +298,7 @@ To edit the build script, you can find it at <a href="./scripts//src/build.ts">.
 - Support for angular and vue (currently untested)
 - Support for Mac and Window
 - An npm script to generate installers for each OS
-- Increase the image resolutions
+- Switch to tsx
 
 ## Credits
 none as of now
