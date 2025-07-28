@@ -10,15 +10,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: debian:bullseye
+      image: debian:plucky
 
     steps:
     - name: Install image dependencies
       run: |
         apt-get update
-        apt-get install -y curl gnupg git
-        curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
-        apt-get install -y nodejs 
+        apt-get install -y gnupg git nodejs
 
     - name: checkout
       uses: actions/checkout@v4
