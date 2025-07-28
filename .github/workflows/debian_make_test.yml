@@ -1,4 +1,4 @@
-name: Ubuntu
+name: Debian
 
 on:
   push:
@@ -9,9 +9,18 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    container:
+      image: debian:bullseye
 
     steps:
+    - name: checkout
+      uses: actions/checkout@v4
+
+    - name: Install image dependencies
+      run: |
+        apt update
+        apt install -y git nodejs npm
+
     - name: checkout
       uses: actions/checkout@v4
       with:
@@ -39,7 +48,7 @@ jobs:
             libwebkit2gtk-4.1-0 \
             pkg-config \
             libboost-all-dev
-
+            
     - name: make
       run: make run
       working-directory: ./engine
