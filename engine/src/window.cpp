@@ -1,22 +1,5 @@
 #include "../include/window.hpp"
 #include "../include/webview_binds.hpp"
-#include "gdk/gdk.h"
-#include "gio/gio.h"
-#include "glib.h"
-#include "gtk/gtk.h"
-#include "info.hpp"
-#include <boost/core/ignore_unused.hpp>
-#include <boost/date_time/posix_time/posix_time_duration.hpp>
-#include <boost/thread/detail/thread.hpp>
-#include <exception>
-#include <memory>
-#include <spdlog/spdlog.h>
-#include <string>
-
-// #include "../include/webview_binds.hpp"
-
-
-// problem is compiler args
  
 RenWeb::Window::Window(unsigned short thread_cnt, unsigned short port)
   : webview::webview(false, nullptr)

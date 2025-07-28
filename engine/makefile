@@ -64,7 +64,7 @@ ifndef TARGET
 	TARGET := debug
 endif
 ifeq ($(TARGET), debug)
-	CXXFLAGS += -g -O0 -Wall -Wextra -Werror -Wno-missing-braces -Wcast-qual -Wpointer-arith -Wunused -Wshadow
+	CXXFLAGS += -g -O0 -Wall -Wextra -Werror -Wno-missing-braces -Wcast-qual -Wpointer-arith -Wunused 
 else
 	CXXFLAGS += -O3 -flto -s
 endif
@@ -75,10 +75,13 @@ BUILD_PATH :=  ../build
 SRC_PATH :=    ./src
 OBJ_PATH :=    $(SRC_PATH)/.build
 INC_PATH :=    ./include
+EXTERN_INC_PATHS := \
+	$(addprefix -I, $(wildcard external/*/include)) \
+	$(addprefix -I, external/webview/core/include) \
 # -----------------------------------------------------------------------------
 # Static Linked Libraries
 # -----------------------------------------------------------------------------
-LIBS := -lspdlog -lboost_system -lboost_url -lboost_thread -lboost_filesystem -lboost_program_options 
+LIBS := -lboost_system -lboost_url -lboost_thread -lboost_filesystem -lboost_program_options 
 ifeq ($(OS_NAME), Windows)
 	LIBS += -ladvapi32 -lole32 -lshell32 -lshlwapi -luser32
 endif
@@ -108,14 +111,14 @@ all: $(BUILD_PATH)/$(EXE)
 # -----------------------------------------------------------------------------
 $(BUILD_PATH)/$(EXE): $(OBJS) | $(BUILD_PATH)
 	$(call step,Linking Executable,$@)
-	$(CXX) $(CXXFLAGS) $(PKG_CFLAGS) -I$(INC_PATH) $^ $(LIBS) $(PKG_LIBS ) $(LIBS) $(PKG_LIBS) -o $@
+	$(CXX) $(CXXFLAGS) $(PKG_CFLAGS) -I$(INC_PATH) $(EXTERN_INC_PATHS) $^ $(LIBS) $(PKG_LIBS ) $(LIBS) $(PKG_LIBS) -o $@
 	$(call step,Linking Executable [DONE],$@)
 # -----------------------------------------------------------------------------
 # RULE: Compile source files to object files
 # -----------------------------------------------------------------------------
 $(OBJ_PATH)/%.o: $(SRC_PATH)/%.cpp | $(OBJ_PATH)
 	$(call step,Compiling,$<)
-	$(CXX) $(CXXFLAGS) $(PKG_CFLAGS) -I$(INC_PATH) -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(PKG_CFLAGS) -I$(INC_PATH) $(EXTERN_INC_PATHS) -c $< -o $@
 	$(call step,Compiling [DONE],$<)
 # -----------------------------------------------------------------------------
 # RULE: Make sure build directory exists
@@ -174,6 +177,7 @@ help:
 	@echo "Usage:"
 	@echo "  make TARGET=debug      Build the application in debug mode"
 	@echo "  make TARGET=release    Build the application in release mode"
+	@echo "  make sub_modules       Builds the submodules"
 	@echo "  make clean             Clean up the build directory"
 	@echo "  make run               Build and run the application"
 	@echo "  make test              Build and test the application"

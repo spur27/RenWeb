@@ -1,5 +1,4 @@
 #include "../include/logger_addons.hpp"
-#include <spdlog/common.h>
 
 spdlog::level::level_enum spdlog::actual_level = spdlog::level::info;
 

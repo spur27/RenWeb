@@ -41,11 +41,12 @@ RenWeb is a combined engine and toolset for developing GUI applications with web
 The RenWeb engine is built with multithreaded web server,  a process manager, all main window technologies, a logger, and more! It takes on a portable structure, searching for files in whatever directory it is placed in. In addition, RenWeb aims to provide full support for *front-end* node libraries as well as JS frameworks like react, offering for more sophisticated development.
 
 The RenWeb engine relies on the following:
-- <a href="https://github.com/webview/webview">webview</a>
-- <a href="https://github.com/gabime/spdlog">spdlog</a>
-- <a href="https://github.com/nlohmann/json">Nlohmann's JSON Library</a>
-- <a href="https://www.boost.org/">Boost Libraries</a>
-- <a href="https://en.cppreference.com/w/cpp/standard_library.html">STD Libraries</a>
+- <a href="https://github.com/webview/webview">webview</a> (*submodule*)
+- <a href="https://github.com/gabime/spdlog">spdlog</a> (*submodule*)
+- <a href="https://github.com/nlohmann/json">nlohmann's JSON library</a> (*submodule*)
+- <a href="https://github.com/ikalnytskyi/termcolor">ikalnytskyi's termcolor library</a> (*submodule*)
+- <a href="https://www.boost.org/">Boost libraries</a>
+- <a href="https://en.cppreference.com/w/cpp/standard_library.html">Standard libraries</a>
 
 For compiling the engine, RenWeb uses <a href="https://www.gnu.org/software/make/">make</a>. For building UIs, RenWeb uses <a href="https://nodejs.org/en">node</a> *only* for webpacking, TypeScript compilation, and script running via the package.jsons.
 
@@ -60,32 +61,25 @@ Every OS needs you to install the following:
 
 ### Linux
 - **Debian-based**
-  - *Download and install* <a href="https://github.com/webview/webview">webview</a>
-    - `apt install libgtk-3-dev libwebkit2gtk-4.1-dev`
-    - `apt install libgtk-3-0 libwebkit2gtk-4.1-0`
-    - `apt install pkg-config`
-  - `apt install libspdlog-dev`
-  - *Download and install* <a href="https://github.com/nlohmann/json">nholmann's json library</a>
+  - `apt install libgtk-3-dev libwebkit2gtk-4.1-dev`
+  - `apt install libgtk-3-0 libwebkit2gtk-4.1-0`
+  - `apt install pkg-config`
   - `apt install libboost-all-dev`
-  - *Make sure C Standard Libraries are installed*
 - **Fedora-based**
-  - *Download and install* <a href="https://github.com/webview/webview">webview</a>
-    - `dnf install gtk3-devel webkit2gtk4.1-devel`
-    - `dnf install gtk3 webkit2gtk4.1`
-    - `dnf install pkgconf-pkg-config`
-  - `dnf install spdlog`
-  - *Download and install* <a href="https://github.com/nlohmann/json">nholmann's json library</a>
+  - `dnf install gtk3-devel webkit2gtk4.1-devel`
+  - `dnf install gtk3 webkit2gtk4.1`
+  - `dnf install pkgconf-pkg-config`
   - `dnf install boost-devel `
-  - *Make sure C Standard Libraries are installed*
 - **Other:**
-  - *Download and install* <a href="https://github.com/webview/webview">webview</a>
-  - *Download and install* <a href="https://github.com/gabime/spdlog?tab=readme-ov-file#package-managers">spdlog</a>
-  - *Download and install* <a href="https://github.com/nlohmann/json">nholmann's json library</a>
+  - *Download and install* <a href="">gtk3</a>
+  - *Download and install* <a href="">webkit2</a>
+  - *Download and install* <a href="">pkg-config</a>
   - *Download and install* <a href="https://www.boostlibraries.org/users/download/">All Boost Libraries</a>
   - *Make sure C Standard Libraries are installed*
 
 ### MacOS
 *<p style="color: red">WIP</p>*
+*In progress:* https://github.com/WebKit/webkit/blob/main/ReadMe.md#getting-the-code
 ### Windows
 *<p style="color: red">WIP</p>*
 

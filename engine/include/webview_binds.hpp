@@ -2,6 +2,7 @@
 #define RENWEB_WEBVIEW_BINDS_H
 #include "window.hpp"
 #include <nlohmann/json.hpp>
+#include <spdlog/spdlog.h>
 #include <boost/process.hpp>
 
 using json = nlohmann::json;

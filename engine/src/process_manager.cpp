@@ -1,7 +1,4 @@
 #include "../include/process_manager.hpp"
-#include <exception>
-#include <spdlog/spdlog.h>
-#include <vector>
 
 RenWeb::ProcessManager::ProcessManager() {
     // this->main_web_page.reset(new RenWeb::Webview(this->info->getAppName()));
@@ -114,7 +111,7 @@ void RenWeb::ProcessManager::bringToForeground(std::string process_name) {
     } else if (multiple_processes) {
         spdlog::warn("Multiple processes of \"" + process_name + "\" are open. Changing first one found to foreground.");
     }
-    pid_t child_pid = proc->id();
+    // pid_t child_pid = proc->id();
     try {
 #if defined(_WIN32)
         // Windows: Enum all windows and bring one belonging to the PID to the front

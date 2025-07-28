@@ -1,17 +1,4 @@
 #include "../include/webview_binds.hpp"
-#include "info.hpp"
-#include "logger_addons.hpp"
-#include "window.hpp"
-#include <boost/core/ignore_unused.hpp>
-#include <exception>
-#include <filesystem>
-#include <spdlog/spdlog.h>
-#include <sstream>
-#include <stdexcept>
-#include <string>
-#include <system_error>
-#include <uchar.h>
-#include <webview/types.h>
 
 // Surrounds a string with quotes
 std::string jsonStr(std::string str) {

@@ -1,26 +1,4 @@
 #include "../include/web_server.hpp"
-#include "info.hpp"
-#include <boost/asio/error.hpp>
-#include <boost/asio/io_context.hpp>
-#include <boost/asio/ip/address.hpp>
-#include <boost/asio/strand.hpp>
-#include <boost/asio/thread_pool.hpp>
-#include <boost/beast/core/bind_handler.hpp>
-#include <boost/beast/core/error.hpp>
-#include <boost/beast/http/field.hpp>
-#include <boost/beast/http/impl/error.hpp>
-#include <boost/beast/http/status.hpp>
-#include <boost/beast/http/string_body.hpp>
-#include <boost/chrono/duration.hpp>
-#include <boost/core/ignore_unused.hpp>
-#include <boost/filesystem/file_status.hpp>
-#include <boost/system/detail/error_code.hpp>
-#include <boost/system/system_error.hpp>
-#include <cstddef>
-#include <exception>
-#include <spdlog/spdlog.h>
-#include <stdexcept>
-#include <string>
 
 RenWeb::Session::Session(tcp::socket&& socket)
   // Take ownership of the stream

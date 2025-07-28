@@ -1,7 +1,4 @@
 #include "../include/info.hpp"
-#include "logger_addons.hpp"
-#include <exception>
-#include <spdlog/spdlog.h>
 
 /* ********************** */
 /* ******** FILE ******** */
