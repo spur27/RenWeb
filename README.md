@@ -83,8 +83,7 @@ Now, install the required technologies to compile the executable
   - `dnf install gtk3-devel webkit2gtk4.1-devel`
   - `dnf install gtk3 webkit2gtk4.1`
   - `dnf install pkgconf-pkg-config`
-  - `dnf install boost-devel`
-  - `dnf install boost`
+  - `dnf install boost-devel boost`
 - **Other:**
   - *Download and install* <a href="">gtk3</a>
   - *Download and install* <a href="">webkit2</a>
