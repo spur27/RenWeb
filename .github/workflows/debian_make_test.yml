@@ -8,6 +8,7 @@ on:
 
 jobs:
   build:
+    runs-on: ubuntu-latest
 
     container:
       image: debian:bullseye
@@ -15,6 +16,8 @@ jobs:
     steps:
     - name: checkout
       uses: actions/checkout@v4
+      with:
+        submodules: recursive
 
     - name: Install image dependencies
       run: |
