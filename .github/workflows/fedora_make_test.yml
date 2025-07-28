@@ -46,6 +46,8 @@ jobs:
             glibc-devel \
             gtk3-devel \
             webkit2gtk4.1-devel \
+            gtk3 \
+            webkit2gtk4.1 \
             pkgconf-pkg-config \
             boost-devel
 
