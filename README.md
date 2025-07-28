@@ -298,6 +298,7 @@ To edit the build script, you can find it at <a href="./scripts//src/build.ts">.
 - Support for angular and vue (currently untested)
 - Support for Mac and Window
 - An npm script to generate installers for each OS
+- Increase the image resolutions
 
 ## Credits
 none as of now
