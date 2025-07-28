@@ -25,7 +25,7 @@
   - [Logging](#logging)
   - [Windows](#windows-1)
 - [Client Design](#client-design)
-- [QnA](#qna)
+- [Q\&A](#qa)
 - [Reminders](#reminders)
 - [Planned Additions](#planned-additions)
 - [Credits](#credits)
@@ -119,7 +119,7 @@ RenWeb either makes a new one of these if none is found or interprets one given.
 A typical config would look like this:
 ```json
 {
-  "test": {
+  "main": {
     "author": "@me",
     "decorated": true,
     "description": "I am an app that does, in fact, do things.",
@@ -258,7 +258,7 @@ Please try and keep all of your asset files in the respective asset folder to ke
 
 To edit the build script, you can find it at <a href="./scripts//src/build.ts">./scripts/src/build.ts</a>. Script don't compile to JS, so you don't need to run TSC. The npm script for running the build script uses `ts-node`. 
 
-## QnA
+## Q&A
 - **Q**: When I run the RenWeb executable nothing displays.
   - **A**: To avoid the classic webapp "flashbang," RenWeb defers the task of showing the window to the program. Make sure you have `window.onload = async () => await Window.show();` or something similar in either a script tag or file.
 - **Q**: How do I add custom function bindings?
