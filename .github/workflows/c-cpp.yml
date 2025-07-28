@@ -13,7 +13,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: change to engine dir
-      run: cd ./engine
-    - name: make
-      run: make
+    - name: ls
+      run: ls
+    # - name: make
+    #   run: make
