@@ -16,8 +16,8 @@ jobs:
     - name: Install image dependencies
       run: |
         dnf install -y git gcovr
-        dnf module enable -y nodejs:18
-        dnf install -y nodejs
+        dnf module enable -y nodejs:20
+        dnf install -y nodejs npm
 
     - name: checkout
       uses: actions/checkout@v3
