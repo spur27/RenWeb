@@ -9,21 +9,21 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     container:
       image: fedora:39
 
     steps:
-    - name: checkout
-    - uses: actions/checkout@v3
-      with:
-        submodules: recursive
-
     - name: Install image dependencies
       run: |
         dnf install -y git gcovr
         dnf module enable -y nodejs:18
         dnf install -y nodejs
+
+    - name: checkout
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+
 
     - name: npm install UI packages
       run: npm i
