@@ -10,7 +10,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: fedora:39
+      image: fedora:42
 
     steps:
     - name: Install image dependencies
@@ -46,8 +46,6 @@ jobs:
             glibc-devel \
             gtk3-devel \
             webkit2gtk4.1-devel \
-            libgtk-3-0 \
-            webkit2gtk4.1 \
             pkgconf-pkg-config \
             boost-devel
 
