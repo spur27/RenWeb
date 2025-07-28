@@ -36,5 +36,5 @@ jobs:
             pkg-config \
             libboost-all-dev
     - name: make
-      run: make
+      run: make run
       working-directory: ./engine
