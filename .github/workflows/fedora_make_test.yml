@@ -15,9 +15,9 @@ jobs:
     steps:
     - name: Install image dependencies
       run: |
-        dnf install -y git gcovr
-        dnf module enable -y nodejs:18
-        dnf install -y nodejs npm
+        dnf install -y curl git gcovr 
+        curl -fsSL https://rpm.nodesource.com/setup_20.x | bash -
+        dnf install -y nodejs
 
     - name: checkout
       uses: actions/checkout@v3

@@ -16,7 +16,9 @@ jobs:
     - name: Install image dependencies
       run: |
         apt-get update
-        apt-get install -y git nodejs npm
+        apt-get install -y curl gnupg git
+        curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+        apt-get install -y nodejs 
 
     - name: checkout
       uses: actions/checkout@v4
