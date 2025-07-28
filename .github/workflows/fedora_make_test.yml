@@ -48,8 +48,9 @@ jobs:
             webkit2gtk4.1-devel \
             gtk3 \
             webkit2gtk4.1 \
-            pkgconf-pkg-config 
-          dnf install -y "$(dnf search boost | grep devel | awk '{print $1}')"
+            pkgconf-pkg-config \
+            boost-devel \
+            boost-url
 
     - name: make
       run: make run
