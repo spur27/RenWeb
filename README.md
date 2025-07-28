@@ -6,7 +6,7 @@
     </a>
 </p>
 
-<!--(*Worflow badges will go here*)-->
+![Ubuntu](https://github.com/SpurSlicer/RenWeb/actions/workflows/ubuntu_make_test.yml/badge.svg)
 
 - [Introduction](#introduction)
 - [Compilation](#compilation)
