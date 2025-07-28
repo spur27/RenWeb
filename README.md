@@ -7,10 +7,10 @@
 </p>
 
 ![Ubuntu](https://github.com/SpurSlicer/RenWeb/actions/workflows/ubuntu_make_test.yml/badge.svg)
-<!-- ![Debian](https://github.com/SpurSlicer/RenWeb/actions/workflows/debian_make_test.yml/badge.svg) -->
 ![Fedora](https://github.com/SpurSlicer/RenWeb/actions/workflows/fedora_make_test.yml/badge.svg)
 ![Windows](https://github.com/SpurSlicer/RenWeb/actions/workflows/windows_make_test.yml/badge.svg)
 ![MacOS](https://github.com/SpurSlicer/RenWeb/actions/workflows/macos_make_test.yml/badge.svg)
+<!-- ![Debian](https://github.com/SpurSlicer/RenWeb/actions/workflows/debian_make_test.yml/badge.svg) -->
 <!-- ![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/SpurSlicer/RenWeb?sort=semver) -->
 
 - [Introduction](#introduction)
