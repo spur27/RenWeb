@@ -40,7 +40,10 @@ jobs:
       run: |
           dnf update -y
           dnf install -y \
-            make gcc gcc-c++ glibc-devel \ 
+            make \
+            gcc \
+            gcc-c++ \
+            glibc-devel \
             gtk3-devel \
             webkit2gtk4.1-devel \
             libgtk-3-0 \
