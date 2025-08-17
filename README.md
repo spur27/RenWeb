@@ -13,7 +13,7 @@
 <!-- ![Debian](https://github.com/SpurSlicer/RenWeb/actions/workflows/debian_make_test.yml/badge.svg) -->
 <!-- ![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/SpurSlicer/RenWeb?sort=semver) -->
 
-- [Introduction](#introduction)
+- [Introduction (OUTDATED: Update to readme is a WIP)](#introduction-outdated-update-to-readme-is-a-wip)
 - [Compilation](#compilation)
   - [Linux](#linux)
   - [MacOS](#macos)
@@ -37,7 +37,7 @@
 - [License](#license)
 
 
-## Introduction
+## Introduction (OUTDATED: Update to readme is a WIP)
 RenWeb is a combined engine and toolset for developing GUI applications with web technology written mostly in C++. The most effective way to use this technology is to fork or clone this repository and develop your GUI application from there so that you have control over both the C++ RenWeb engine and your webpages. This also allows for you to add or remove settings, JavaScript engine bindings, etc. with ease.
 <p align="center">
         <img height=500 src="https://github.com/SpurSlicer/RenWeb/blob/main/docs/assets/window_example_1.png" alt="Window displaying the test page">

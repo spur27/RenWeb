@@ -117,7 +117,7 @@ document.querySelector(".mk_dir").onclick = async () => {
 
 document.querySelector(".ls_dir").onclick = async () => {
     const filename = document.querySelector(".write_file_msg").value;
-    await Log.debug(`Making dir "${filename}"`);
+    await Log.debug(`Listing dir "${filename}"`);
     const dirs = await FS.ls(filename);
     if (dirs == null) {
         document.querySelector(".ls_dir").style.backgroundColor = "red";

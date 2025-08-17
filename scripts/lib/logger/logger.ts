@@ -57,7 +57,11 @@ export class Logger {
                     return ["UNKNOWN", Chalk.bold.italic.cyan("UNKNOWN")]
             }
         })(log_type);
-        console.log(`[${this.color_fn(this.script_name)}] ${Chalk.gray(this.getDate)} [${Chalk.italic(process.pid)}] [${log_text_colored}] `, msg);
+        if (log_type < LogLevel.INFO) {
+            console.error(`[${this.color_fn(this.script_name)}] ${Chalk.gray(this.getDate)} [${Chalk.italic(process.pid)}] [${log_text_colored}] `, msg);
+        } else {
+            console.log(`[${this.color_fn(this.script_name)}] ${Chalk.gray(this.getDate)} [${Chalk.italic(process.pid)}] [${log_text_colored}] `, msg);
+        }
         if (this.log_to_file) {
             try {
                 appendFileSync(this.log_file_path, `[${this.script_name}] ${this.getDate} [${process.pid}] [${log_text}] ${msg}\n`);

@@ -1,7 +1,12 @@
 {
   "scripts": {
-    "build": "cd ./scripts && npm run build",
-    "run": "cd ./scripts && npm run run"
+    "script:build": "cd ./scripts && npm run build",
+    "script:installer": "cd ./scripts && npm run installer",
+    "script:getname": "cd ./scripts && npm run getname",
+    "make": "cd ./engine && make",
+    "run": "cd ./engine && make run",
+    "test": "cd ./engine && make test",
+    "compile:ts": "cd ./src && npx tsc"
   },
   "devDependencies": {
     "@types/react": "^19.1.8",

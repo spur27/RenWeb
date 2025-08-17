@@ -9,3 +9,5 @@ libs.log
 node_modules
 package-lock.json
 dist
+installers
+todo.txt

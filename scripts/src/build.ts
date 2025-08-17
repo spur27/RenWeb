@@ -100,7 +100,7 @@ const pack = async (page: string, path: string, filename: string) => {
                             )
                     },
                     {
-                        test: /\.(png|jpe?g|gif|svg|woff2?|eot|ttf|otf|wav)$/i,
+                        test: /\.(png|jpe?g|gif|svg|woff2?|eot|ttf|otf|wav|ico)$/i,
                         type: 'asset/resource',
                         generator: {
                             filename: '../../assets/[name][ext]'

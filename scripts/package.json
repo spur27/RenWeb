@@ -1,7 +1,8 @@
 {
   "scripts": {
-    "build": "npx ts-node ./src/build.ts",
-    "run": "cd ../engine && make run"
+    "build": "npx tsx ./src/build.ts",
+    "installer": "npx tsx ./src/installer.ts",
+    "getname": "npx tsx ./src/getname.ts"
   },
   "devDependencies": {
     "@babel/core": "^7.27.7",
@@ -34,7 +35,7 @@
     "style-loader": "^4.0.0",
     "terser-webpack-plugin": "^5.3.14",
     "ts-loader": "^9.5.2",
-    "ts-node": "^10.9.2",
+    "tsx": "^4.20.4",
     "typescript": "^5.8.3",
     "webpack": "^5.99.9",
     "webpack-cli": "^6.0.1"
