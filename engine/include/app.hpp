@@ -6,6 +6,7 @@
 #include "window.hpp"
 // #include <map>
 // #include <algorithm>
+#include <map>
 #include <string>
 #include <spdlog/spdlog.h>
 #include <vector>
@@ -17,18 +18,16 @@
 
 
 namespace RenWeb {
-    class ArgsManager {
+    class App {
         private:
-            ArgsManager();
-            ~ArgsManager();
-            inline static boost::program_options::options_description desc 
+            boost::program_options::options_description desc 
                 = boost::program_options::options_description("Available Options");
-            static void help();
-            static void version();
-            static void clear();
-            inline static std::vector<std::string> pages_vec;
+            std::vector<std::string> pages;
+            void addArgs();
         public:
-            static void parse(int, char**);
+            App();
+            ~App();
+            void run(int, char**);
     };
 };
 #endif

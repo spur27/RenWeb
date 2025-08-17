@@ -1,5 +1,4 @@
 #include "../include/window.hpp"
-#include "../include/webview_binds.hpp"
  
 RenWeb::Window::Window(unsigned short thread_cnt, unsigned short port)
   : webview::webview(false, nullptr)
@@ -71,11 +70,6 @@ RenWeb::Window* RenWeb::Window::unbindFunction(std::string fn_name) {
     } catch (const std::runtime_error& e) {
         spdlog::error(e.what());
     }
-    return this;
-}
-
-RenWeb::Window* RenWeb::Window::bindAll() {
-    RenWeb::Bindings::bind_all(this);
     return this;
 }
 

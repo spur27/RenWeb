@@ -17,7 +17,7 @@ endef
 # -----------------------------------------------------------------------------
 # Binary Name
 # -----------------------------------------------------------------------------
-EXE := renweb_app
+EXE := $(shell npx tsx ../scripts/src/getname.ts)
 # -----------------------------------------------------------------------------
 # OS info
 # -----------------------------------------------------------------------------
@@ -139,14 +139,21 @@ $(OBJ_PATH):
 # -----------------------------------------------------------------------------
 clean:
 	$(call step,Cleaning)
-	rm -rf $(BUILD_PATH)/$(EXE) $(OBJ_PATH)/*.o
+	find $(BUILD_PATH) -mindepth 1 \
+	-not -name 'config.json' \
+	-not -path '$(BUILD_PATH)/assets/*' \
+	-not -path '$(BUILD_PATH)/assets' \
+	-not -path '$(BUILD_PATH)/content/*' \
+	-not -path '$(BUILD_PATH)/content' \
+	-exec rm -rf {} +
+	rm -rf $(OBJ_PATH)/*.o
 	$(call step,Cleaning [DONE])
 # -----------------------------------------------------------------------------
 # COMMAND: Run the program
 # -----------------------------------------------------------------------------
 run: $(BUILD_PATH)/$(EXE)
 	$(call step,Running)
-	./$(BUILD_PATH)/$(EXE) -l1
+	./$(BUILD_PATH)/$(EXE) $(ARGS)
 	$(call step,Running [DONE])
 # -----------------------------------------------------------------------------
 # COMMAND: Test the program

@@ -25,6 +25,7 @@ using WindowHandle = GtkWidget*;  // GtkWindow*
 #include <algorithm>
 #include <string>
 
+
 namespace RenWeb {
     struct ChooseFileDialogSettings {
         std::vector<std::pair<std::string, std::vector<std::string>>> patterns = {};

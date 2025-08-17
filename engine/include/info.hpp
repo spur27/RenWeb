@@ -12,9 +12,11 @@
 #include <stdexcept>
 #include <webview/types.h>
 
+// DONT RENAME OR REMOVE DEFINES!!
+// You can still change the define values and add new defines
 #define RENWEB_INFO_DEFAULT_PAGE "test"
-#define RENWEB_INFO_DEFAULT_NAME "RenWeb"
-#define RENWEB_INFO_DEFAULT_VERSION "a0.0.1"
+#define RENWEB_INFO_DEFAULT_NAME "RenWeb" 
+#define RENWEB_INFO_DEFAULT_VERSION "0.0.1"
 #define RENWEB_INFO_DEFAULT_DESCRIPTION "I am an app that does things."
 #define RENWEB_INFO_DEFAULT_LICENSE "LISC"
 #define RENWEB_INFO_DEFAULT_AUTHOR "@YOU"

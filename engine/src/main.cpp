@@ -1,6 +1,7 @@
-#include "../include/args_manager.hpp"
+#include "../include/app.hpp"
 
 int main(int argc, char** argv) {
-    RenWeb::ArgsManager::parse(argc, argv);
+    std::unique_ptr<RenWeb::App> app(new RenWeb::App());
+    app->run(argc, argv);
     return 0;
 }
