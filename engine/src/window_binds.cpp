@@ -1,5 +1,6 @@
 #include "../include/window.hpp"
 #include "../include/window_binds_helper.hpp"
+#include <boost/process/environment.hpp>
 
 using namespace RenWeb;
 using namespace RenWeb::BindingHelpers;
@@ -396,7 +397,7 @@ RenWeb::Window* RenWeb::Window::bindAll() {
         ->bindFunction("BIND_getPID", [](const std::string& req) -> std::string {
             // ()
             boost::ignore_unused(req);
-            return std::to_string(_getpid());
+            return std::to_string(boost::this_process::get_id());
         })
         ->bindFunction("BIND_getApplicationDirPath", [](const std::string& req) -> std::string {
             // ()

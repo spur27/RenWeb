@@ -103,7 +103,7 @@ ifeq ($(OS_NAME), Apple)
 	LIBS := -ldl 
 endif
 ifeq ($(OS_NAME), Linux)
-	LIBS := -ldl 
+	LIBS := -ldl -lboost_system -lboost_url -lboost_thread -lboost_filesystem -lboost_program_options
 endif
 # -----------------------------------------------------------------------------
 # Dynamic Linked Libraries
