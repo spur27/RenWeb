@@ -356,8 +356,9 @@ std::vector<std::string> RenWeb::Window::openChooseFilesDialog(bool multi, bool 
 
 void RenWeb::Window::start() {
     this->refreshSettings()
-        ->bindAll()
-        ->reloadPage()
+        ->bindAll();
+    this->set_html("<html\"><head><style>html { backgroundColor: black; width: 100vw; height: 100vh; }</style></head></html>");
+    this->reloadPage()
         // ->hide()
         ->runWindow()
         ->terminateWindow()
