@@ -36,6 +36,7 @@ namespace RenWeb {
         private:
             std::map<std::string, sync_binding_t> bind_cache;
             bool isURI(std::string);
+            RenWeb::Window* processContents();
         public:
             RenWeb::ProcessManager process_manager;
             RenWeb::WebServer web_server;

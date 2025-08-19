@@ -1,5 +1,9 @@
 #include "../include/window.hpp"
+#include "gdk/gdk.h"
+#include "gtk/gtk.h"
+#include "webview/detail/platform/linux/webkitgtk/compat.hh"
 #include <boost/core/ignore_unused.hpp>
+#include <boost/date_time/posix_time/posix_time_duration.hpp>
  
 RenWeb::Window::Window(unsigned short thread_cnt, unsigned short port)
   : webview::webview(false, nullptr)
@@ -19,6 +23,19 @@ RenWeb::Window::Window(unsigned short thread_cnt, unsigned short port, std::stri
 
 RenWeb::Window::~Window() {
     spdlog::debug("Window object deconstructed.");
+}
+
+RenWeb::Window* RenWeb::Window::processContents() {
+    // this->set_html("<html\"><head><style>html { backgroundColor: black; width: 100vw; height: 100vh; }</style></head></html>");
+#if defined(_WIN32)
+    spdlog::critical("hideUntilContentLoaded NOT IMPLEMENTED FOR apple");
+#elif defined(__APPLE__)
+    spdlog::critical("hideUntilContentLoaded NOT IMPLEMENTED FOR apple");
+#elif defined(__linux__)
+    this->reloadPage()
+        ->hide();
+#endif
+    return this;
 }
 
 bool RenWeb::Window::isURI(std::string maybe_uri) {
@@ -356,10 +373,8 @@ std::vector<std::string> RenWeb::Window::openChooseFilesDialog(bool multi, bool 
 
 void RenWeb::Window::start() {
     this->refreshSettings()
-        ->bindAll();
-    this->set_html("<html\"><head><style>html { backgroundColor: black; width: 100vw; height: 100vh; }</style></head></html>");
-    this->reloadPage()
-        // ->hide()
+        ->bindAll()
+        ->processContents()
         ->runWindow()
         ->terminateWindow()
         ->unbindAll();
