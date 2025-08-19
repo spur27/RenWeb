@@ -28,7 +28,7 @@ void spdlog::refresh() {
     console_sink->set_level(spdlog::actual_level);
     console_sink->set_pattern(colored_log_str.str());
 
-    auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(std::filesystem::path(RenWeb::Info::File::dir + "/log.txt"), false);
+    auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(std::filesystem::path(RenWeb::Info::File::dir + "/log.txt").string(), false);
     file_sink->set_level(spdlog::level::trace);
     file_sink->set_pattern(boring_log_str.str());
     std::vector<spdlog::sink_ptr> log_sinks {console_sink, file_sink};
@@ -43,12 +43,12 @@ void spdlog::refresh() {
 }
 
 void spdlog::clear() {
-    const auto log_file_path = std::filesystem::path(RenWeb::Info::File::dir + "/log.txt");
+    const std::filesystem::path log_file_path = std::filesystem::path(RenWeb::Info::File::dir) / "log.txt";
     if (std::filesystem::exists(log_file_path)) {
-        std::filesystem::resize_file(std::filesystem::path(RenWeb::Info::File::dir + "/log.txt"), 0);
+        std::filesystem::resize_file(std::filesystem::path(RenWeb::Info::File::dir) / "log.txt", 0);
     }
 }
 
-boost::filesystem::path spdlog::getLogFilePath() {
-    return boost::filesystem::path(RenWeb::Info::File::dir + "/log.txt");
+std::filesystem::path spdlog::getLogFilePath() {
+    return std::filesystem::path(RenWeb::Info::File::dir) / "log.txt";
 }

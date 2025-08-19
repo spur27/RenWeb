@@ -21,7 +21,8 @@ window.onresize = async () => {
     await Window.updateSize();
 }
 window.onload = async () => {
-    await Window.show();
+    await Log.info("Window content has been loaded.");
+    // await Window.show();
 }
 document.querySelector(".log_trace").onclick = async () => {
     await Log.trace(document.querySelector(".log_msg").value);

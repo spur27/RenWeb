@@ -396,12 +396,12 @@ RenWeb::Window* RenWeb::Window::bindAll() {
         ->bindFunction("BIND_getPID", [](const std::string& req) -> std::string {
             // ()
             boost::ignore_unused(req);
-            return std::to_string(getpid());
+            return std::to_string(_getpid());
         })
         ->bindFunction("BIND_getApplicationDirPath", [](const std::string& req) -> std::string {
             // ()
             boost::ignore_unused(req);
-            return strToJsonStr(RenWeb::Info::File::dir);
+            return json{strToUint8arrVec(RenWeb::Info::File::dir)}[0].dump();
         });
     return this;
 }

@@ -16,7 +16,6 @@
 #include <boost/process.hpp>
 #include <stdexcept>
 
-
 namespace RenWeb {
     class App {
         private:

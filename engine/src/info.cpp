@@ -39,7 +39,7 @@
             spdlog::error("Can't refresh setting from a config when no page is set!");
             return;
         }
-        const std::filesystem::path config_path(RenWeb::Info::File::dir + "/config.json");
+        const std::filesystem::path config_path = std::filesystem::path(RenWeb::Info::File::dir) / "config.json";
         if (!std::filesystem::exists(config_path)) {
             spdlog::error("No \"config.json\" found at '" + config_path.string() +"'");
             return;
@@ -89,7 +89,7 @@
             spdlog::error("Can't save settings when no page is set!");
             return;
         }
-        const std::filesystem::path config_path(RenWeb::Info::File::dir + "/config.json");
+        const std::filesystem::path config_path = std::filesystem::path(RenWeb::Info::File::dir) / "config.json";
         json json_v;
         if (std::filesystem::exists(config_path)) {
             std::ifstream config_file_contents(config_path);

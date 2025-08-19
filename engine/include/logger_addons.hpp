@@ -15,7 +15,7 @@
 namespace spdlog {
     void refresh();
     void clear();
-    boost::filesystem::path getLogFilePath();
+    std::filesystem::path getLogFilePath();
     extern spdlog::level::level_enum actual_level;
 };
 #endif

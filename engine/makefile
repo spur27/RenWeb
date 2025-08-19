@@ -1,38 +1,4 @@
-# -----------------------------------------------------------------------------
-# Utility stuff for the makefile
-# -----------------------------------------------------------------------------
-RESET  := \033[0m
-RED    := \033[31m
-GREEN  := \033[32m
-YELLOW := \033[33m
-BLUE   := \033[34m
-CYAN   := \033[36m
-BOLD   := \033[1m
-define describe
-	@printf "$(GREEN)$(BOLD)%s$(RESET) %s\n" "$(1)" "$(2)"
-endef
-define step
-	@printf "$(CYAN)$(BOLD)%s$(RESET) %s\n" "$(1)" "$(2)"
-endef
-# -----------------------------------------------------------------------------
-# Binary Name
-# -----------------------------------------------------------------------------
-EXE := $(shell npx tsx ../scripts/src/getname.ts)
-# -----------------------------------------------------------------------------
-# OS info
-# -----------------------------------------------------------------------------
-ifeq ($(OS),Windows_NT)
-    OS_NAME := Windows
-else
-    UNAME_S := $(shell uname -s)
-    ifeq ($(UNAME_S),Linux)
-        OS_NAME := Linux
-    else ifeq ($(UNAME_S),Darwin)
-        OS_NAME := Apple
-    else
-        $(error Unknown operating system detected. Don't know how to proceed :/)
-    endif
-endif
+SHELL := /usr/bin/bash
 # -----------------------------------------------------------------------------
 # Toolchain prefix
 # -		ARM 32-bit (Linux): 		   CROSS_COMPILE := arm-linux-gnueabihf-
@@ -53,21 +19,73 @@ endif
 # -----------------------------------------------------------------------------
 CROSS_COMPILE :=
 # -----------------------------------------------------------------------------
-# Compiler
-# -----------------------------------------------------------------------------
-CXX := $(CROSS_COMPILE)g++
-CXXFLAGS += -MMD -MP
-# -----------------------------------------------------------------------------
-# Build mode
+# Target type
 # -----------------------------------------------------------------------------
 ifndef TARGET
 	TARGET := debug
 endif
-ifeq ($(TARGET), debug)
-	CXXFLAGS += -g -O0 -Wall -Wextra -Werror -Wno-missing-braces -Wcast-qual -Wpointer-arith -Wunused 
+# -----------------------------------------------------------------------------
+# OS info
+# -----------------------------------------------------------------------------
+ifeq ($(OS),Windows_NT)
+    OS_NAME := Windows
+	EXE_EXT := .exe
+	OBJ_EXT := .obj
+	CXX := $(CROSS_COMPILE)cl
+	CXXFLAGS := /std:c++17 /utf-8 /bigobj
+	ifeq ($(TARGET),debug)
+		CXXFLAGS += /EHsc /Zi /Od /W3
+	else
+		CXXFLAGS += /EHsc /O2 /MT
+	endif
 else
-	CXXFLAGS += -O3 -flto -s
+    UNAME_S := $(shell uname -s)
+	EXE_EXT :=
+	OBJ_EXT := .o
+	CXX := $(CROSS_COMPILE)g++
+	CXXFLAGS := -MMD -MP
+	ifeq ($(TARGET), debug)
+		CXXFLAGS += -g -O0 -Wall -Wextra  -Wno-missing-braces -Wcast-qual -Wpointer-arith -Wunused 
+	else
+		CXXFLAGS += -O3 -flto -s
+	endif
+    ifeq ($(UNAME_S),Linux)
+        OS_NAME := Linux
+    else ifeq ($(UNAME_S),Darwin)
+        OS_NAME := Apple
+    else
+        $(error Unknown operating system detected. Don't know how to proceed :/)
+    endif
 endif
+# -----------------------------------------------------------------------------
+# Utility stuff for the makefile
+# -----------------------------------------------------------------------------
+# ifeq ($(OS_NAME),Windows)
+# define describe
+# 	@printf "%s %s\n" "$(1)" "$(2)"
+# endef
+# define step
+# 	@printf "%s %s\n" "$(1)" "$(2)"
+# endef
+# else
+RESET  := \033[0m
+RED    := \033[31m
+GREEN  := \033[32m
+YELLOW := \033[33m
+BLUE   := \033[34m
+CYAN   := \033[36m
+BOLD   := \033[1m
+define describe
+	@printf "$(GREEN)$(BOLD)%s$(RESET) %s\n" "$(1)" "$(2)"
+endef
+define step
+	@printf "$(CYAN)$(BOLD)%s$(RESET) %s\n" "$(1)" "$(2)"
+endef
+# endif
+# -----------------------------------------------------------------------------
+# Binary Name
+# -----------------------------------------------------------------------------
+EXE := $(shell cd ../scripts && npx tsx ./src/getname.ts)$(EXE_EXT)
 # -----------------------------------------------------------------------------
 # Paths 
 # -----------------------------------------------------------------------------
@@ -81,27 +99,25 @@ EXTERN_INC_PATHS := \
 # -----------------------------------------------------------------------------
 # Static Linked Libraries
 # -----------------------------------------------------------------------------
-LIBS := -lboost_system -lboost_url -lboost_thread -lboost_filesystem -lboost_program_options 
-ifeq ($(OS_NAME), Windows)
-	LIBS += -ladvapi32 -lole32 -lshell32 -lshlwapi -luser32
-endif
 ifeq ($(OS_NAME), Apple)
-	LIBS += -ldl 
+	LIBS := -ldl 
 endif
 ifeq ($(OS_NAME), Linux)
-	LIBS += -ldl 
+	LIBS := -ldl 
 endif
 # -----------------------------------------------------------------------------
 # Dynamic Linked Libraries
 # -----------------------------------------------------------------------------
-PKG_CONFIG := pkg-config
-PKG_CFLAGS := $(shell $(PKG_CONFIG) --cflags gtk+-3.0 webkit2gtk-4.1)
-PKG_LIBS   := $(shell $(PKG_CONFIG) --libs gtk+-3.0   webkit2gtk-4.1)
+ifeq ($(OS_NAME),Linux)
+	PKG_CONFIG := pkg-config
+	PKG_CFLAGS := $(shell $(PKG_CONFIG) --cflags gtk+-3.0 webkit2gtk-4.1)
+	PKG_LIBS   := $(shell $(PKG_CONFIG) --libs gtk+-3.0   webkit2gtk-4.1)
+endif
 # -----------------------------------------------------------------------------
 # Source and Object files
 # -----------------------------------------------------------------------------
 SRCS := $(wildcard $(SRC_PATH)/*.cpp)
-OBJS := $(patsubst $(SRC_PATH)/%.cpp, $(OBJ_PATH)/%.o, $(SRCS))
+OBJS := $(patsubst $(SRC_PATH)/%.cpp, $(OBJ_PATH)/%$(OBJ_EXT), $(SRCS))
 # -----------------------------------------------------------------------------
 # Build darget
 # -----------------------------------------------------------------------------
@@ -111,14 +127,22 @@ all: $(BUILD_PATH)/$(EXE)
 # -----------------------------------------------------------------------------
 $(BUILD_PATH)/$(EXE): $(OBJS) | $(BUILD_PATH)
 	$(call step,Linking Executable,$@)
-	$(CXX) $(CXXFLAGS) $(PKG_CFLAGS) -I$(INC_PATH) $(EXTERN_INC_PATHS) $^ $(LIBS) $(PKG_LIBS ) $(LIBS) $(PKG_LIBS) -o $@
+ifeq ($(OS_NAME),Windows)
+	$(CXX) $(OBJS) $(CXXFLAGS) /link /SUBSYSTEM:CONSOLE /OUT:$@
+else 
+	$(CXX) $(CXXFLAGS) $(PKG_CFLAGS) -I$(INC_PATH) $(EXTERN_INC_PATHS) $^ $(LIBS) $(PKG_LIBS) -o $@
+endif
 	$(call step,Linking Executable [DONE],$@)
 # -----------------------------------------------------------------------------
 # RULE: Compile source files to object files
 # -----------------------------------------------------------------------------
-$(OBJ_PATH)/%.o: $(SRC_PATH)/%.cpp | $(OBJ_PATH)
+$(OBJ_PATH)/%$(OBJ_EXT): $(SRC_PATH)/%.cpp | $(OBJ_PATH)
 	$(call step,Compiling,$<)
+ifeq ($(OS_NAME),Windows)
+	$(CXX) $(CXXFLAGS) /I$(INC_PATH) $(EXTERN_INC_PATHS) /c $< /Fo$@
+else 
 	$(CXX) $(CXXFLAGS) $(PKG_CFLAGS) -I$(INC_PATH) $(EXTERN_INC_PATHS) -c $< -o $@
+endif
 	$(call step,Compiling [DONE],$<)
 # -----------------------------------------------------------------------------
 # RULE: Make sure build directory exists
@@ -146,7 +170,7 @@ clean:
 	-not -path '$(BUILD_PATH)/content/*' \
 	-not -path '$(BUILD_PATH)/content' \
 	-exec rm -rf {} +
-	rm -rf $(OBJ_PATH)/*.o
+	rm -rf $(OBJ_PATH)/*$(OBJ_EXT)
 	$(call step,Cleaning [DONE])
 # -----------------------------------------------------------------------------
 # COMMAND: Run the program
@@ -197,4 +221,8 @@ help:
 # -----------------------------------------------------------------------------
 # Includes
 # -----------------------------------------------------------------------------
+ifeq ($(OS_NAME),Windows)
+-include
+else
 -include $(OBJS:.o=.d)
+endif

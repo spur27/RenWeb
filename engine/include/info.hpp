@@ -12,6 +12,10 @@
 #include <stdexcept>
 #include <webview/types.h>
 
+#if defined(_WIN32)
+#include <windows.h>
+#endif
+
 // DONT RENAME OR REMOVE DEFINES!!
 // You can still change the define values and add new defines
 #define RENWEB_INFO_DEFAULT_PAGE "test"

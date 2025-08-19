@@ -120,7 +120,7 @@ export namespace Util {
     export async function getPID(): Promise<number> 
         { return await BIND_getPID() as number; }
     export async function getApplicationDirPath(): Promise<string> 
-        { return await BIND_getApplicationDirPath() as string; }
+        { return Util.fromUint8array(new Uint8Array(await BIND_getApplicationDirPath() as number[])) ?? "" as string; }
     // -------------------NON BINDINGS--------------------------        
     export function isNullish(variable: {}): boolean 
         { return (variable == null || variable == undefined); }

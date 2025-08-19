@@ -65,7 +65,7 @@ void RenWeb::Session::handle_current_request() {
     if (this->req.method() != http::verb::get && this->req.method() != http::verb::head) {
         // return send(bad_request())
     }
-    spdlog::info("[SERVER] Recieved \"" + std::string(this->req.method_string()) +  "\" request from \"http://" + this->stream.socket().remote_endpoint().address().to_string() + ":" + std::to_string(this->stream.socket().remote_endpoint().port()) + "\"");
+    spdlog::info("[SERVER] Recieved \"" + std::string(this->req.method_string()) +  "\" request from \"http://" + this->stream.socket().remote_endpoint().address().to_string() + ":" + std::to_string(this->stream.socket().remote_endpoint().port()) + "\"" + " with target \"" + std::string(req.target()) + "\"");
     switch (this->req.method()) {
         case http::verb::get:
         case http::verb::head:
@@ -96,20 +96,24 @@ void RenWeb::Session::handle_get() {
         spdlog::warn("[SERVER] No page is set. Resetting to default.");
         RenWeb::Info::App::resetPageToDefault();
     }
-    std::filesystem::path resource_path;
-    std::string target = (this->req.target() == "/")
-                             ? "/index.html"
-                             : std::string(this->req.target());
-    if (target.rfind("/assets", 0) == 0) {
-        target = target.substr(7);
-        std::filesystem::path custom_resource_path (RenWeb::Info::File::dir + "/custom" + target);
+    std::filesystem::path resource_path = std::filesystem::path(std::string(this->req.target()));
+    if (std::string(this->req.target()) == "/" || std::string(this->req.target()) == "\\") {
+        resource_path = std::filesystem::path("index.html");
+    } else if (std::string(this->req.target())[0] == '/' || std::string(this->req.target())[0] == '\\') {
+        resource_path = std::filesystem::path(std::string(this->req.target()).substr(1));
+    } else {
+        resource_path = std::filesystem::path(std::string(this->req.target()));
+    }
+    if (resource_path.string().rfind("assets", 0) == 0) {
+        resource_path = std::filesystem::path(resource_path.string().substr(7));
+        std::filesystem::path custom_resource_path = std::filesystem::path(RenWeb::Info::File::dir) / "custom" / resource_path;
         if (std::filesystem::exists(custom_resource_path)) {
             resource_path = custom_resource_path;
         } else {
-            resource_path = std::filesystem::path(RenWeb::Info::File::dir + "/assets" + target);
+            resource_path = std::filesystem::path(RenWeb::Info::File::dir) / "assets" / resource_path;
         }
     } else {
-        resource_path = std::filesystem::path(RenWeb::Info::File::dir + "/content/" + RenWeb::Info::App::page + target);
+        resource_path = std::filesystem::path(RenWeb::Info::File::dir) / "content" / RenWeb::Info::App::page / resource_path;
     }
     if (!std::filesystem::exists(resource_path)) {
         spdlog::error("[SERVER] file \"" + resource_path.string() + "\" was not found.");
@@ -119,7 +123,7 @@ void RenWeb::Session::handle_get() {
     try {
         beast::error_code ec;
         http::file_body::value_type body;
-        body.open(resource_path.c_str(), beast::file_mode::scan, ec);
+        body.open(resource_path.string().c_str(), beast::file_mode::scan, ec);
         if (ec) throw beast::system_error(ec);
         auto const size = body.size();
         spdlog::debug("[SERVER] reading \"" + std::to_string(size) + "\" bytes from \"" + resource_path.string() + "\"");
@@ -238,7 +242,7 @@ void RenWeb::Session::run() {
 }
 
 /*static*/ std::string RenWeb::Session::MIME(std::string target) {
-    auto const ext = boost::filesystem::path(target).extension().string();
+    auto const ext = std::filesystem::path(target).extension().string();
     if(ext == ".htm")  return "text/html";
     else if(ext == ".html") return "text/html";
     else if(ext == ".php")  return "text/html";

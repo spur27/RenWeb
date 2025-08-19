@@ -43,6 +43,9 @@ std::vector<char> RWBH::jsonUint8arrToVec(json json_v) {
     }
 }
 
+std::vector<unsigned int> RWBH::strToUint8arrVec(std::string str) {
+    return std::vector<unsigned int>{str.begin(), str.end()};
+}
 
 std::string RWBH::jsonUint8arrToString(json json_v) {
     std::vector<char> vec = RWBH::jsonUint8arrToVec(json_v);

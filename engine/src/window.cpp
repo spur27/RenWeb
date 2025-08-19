@@ -1,4 +1,5 @@
 #include "../include/window.hpp"
+#include <boost/core/ignore_unused.hpp>
  
 RenWeb::Window::Window(unsigned short thread_cnt, unsigned short port)
   : webview::webview(false, nullptr)
@@ -127,13 +128,16 @@ RenWeb::Window* RenWeb::Window::refreshSettings() {
     return this;
 }
 
-
 std::pair<unsigned int, unsigned int> RenWeb::Window::getSize() {
     int width, height;
 #if defined(_WIN32)
-    spdlog::critical("refresh decorated NOT IMPLEMENTED FOR windows");
+    RECT rect;
+    HWND hwnd = GetActiveWindow();
+    GetClientRect(hwnd, &rect);
+    width = rect.right - rect.left;
+    height = rect.bottom - rect.top;
 #elif defined(__APPLE__)
-    spdlog::critical("refresh decorated NOT IMPLEMENTED FOR apple");
+    spdlog::critical("getSize NOT IMPLEMENTED FOR apple");
 #elif defined(__linux__)
     auto window_widget = this->window().value();
     gtk_window_get_size(GTK_WINDOW(window_widget), &width, &height);
@@ -143,7 +147,16 @@ std::pair<unsigned int, unsigned int> RenWeb::Window::getSize() {
 
 RenWeb::Window* RenWeb::Window::setDecorated(bool enable) {
 #if defined(_WIN32)
-    spdlog::critical("decorated NOT IMPLEMENTED FOR windows");
+    HWND hwnd = GetActiveWindow();
+    LONG_PTR style = GetWindowLongPtr(hwnd, GWL_STYLE);
+    if (enable) {
+        style |= (WS_CAPTION | WS_THICKFRAME | WS_BORDER | WS_DLGFRAME);
+    } else {
+        style &= ~(WS_CAPTION | WS_THICKFRAME | WS_BORDER | WS_DLGFRAME);
+    }
+    SetWindowLongPtr(hwnd, GWL_STYLE, style);
+    SetWindowPos(hwnd, nullptr, 0, 0, 0, 0,
+        SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 #elif defined(__APPLE__)
     spdlog::critical("decorated NOT IMPLEMENTED FOR apple");
 #elif defined(__linux__)
@@ -157,7 +170,16 @@ RenWeb::Window* RenWeb::Window::setDecorated(bool enable) {
 
 RenWeb::Window* RenWeb::Window::setResizable(bool enable) {
 #if defined(_WIN32)
-    spdlog::critical("resizable NOT IMPLEMENTED FOR windows");
+    HWND hwnd = GetActiveWindow();
+    LONG_PTR style = GetWindowLongPtr(hwnd, GWL_STYLE);
+    if (enable) {
+        style |= (WS_THICKFRAME | WS_MAXIMIZEBOX);
+    } else {
+        style &= ~(WS_THICKFRAME | WS_MAXIMIZEBOX);
+    }
+    SetWindowLongPtr(hwnd, GWL_STYLE, style);
+    SetWindowPos(hwnd, nullptr, 0, 0, 0, 0,
+        SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 #elif defined(__APPLE__)
     spdlog::critical("resizable NOT IMPLEMENTED FOR apple");
 #elif defined(__linux__)
@@ -173,7 +195,9 @@ RenWeb::Window* RenWeb::Window::setResizable(bool enable) {
 
 RenWeb::Window* RenWeb::Window::setKeepAbove(bool enable) {
 #if defined(_WIN32)
-    spdlog::critical("keep above NOT IMPLEMENTED FOR windows");
+    HWND hwnd = GetActiveWindow();
+    SetWindowPos(hwnd, (enable) ? HWND_TOPMOST : HWND_NOTOPMOST, 0, 0, 0, 0,
+        SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
 #elif defined(__APPLE__)
     spdlog::critical("keep above NOT IMPLEMENTED FOR apple");
 #elif defined(__linux__)
@@ -186,7 +210,8 @@ RenWeb::Window* RenWeb::Window::setKeepAbove(bool enable) {
 
 RenWeb::Window* RenWeb::Window::minimize() {
 #if defined(_WIN32)
-    spdlog::critical("minimize NOT IMPLEMENTED FOR windows");
+    HWND hwnd = GetActiveWindow();
+    ShowWindow(hwnd, (IsIconic(hwnd)) ? SW_RESTORE : SW_MINIMIZE);
 #elif defined(__APPLE__)
     spdlog::critical("minimize NOT IMPLEMENTED FOR apple");
 #elif defined(__linux__)
@@ -197,7 +222,8 @@ RenWeb::Window* RenWeb::Window::minimize() {
 }
 RenWeb::Window* RenWeb::Window::maximize() {
 #if defined(_WIN32)
-    spdlog::critical("maximize NOT IMPLEMENTED FOR windows");
+    HWND hwnd = GetActiveWindow();
+    ShowWindow(hwnd, (IsZoomed(hwnd)) ? SW_RESTORE : SW_MAXIMIZE);
 #elif defined(__APPLE__)
     spdlog::critical("maximize NOT IMPLEMENTED FOR apple");
 #elif defined(__linux__)
@@ -228,7 +254,9 @@ RenWeb::Window* RenWeb::Window::fullscreen() {
 
 RenWeb::Window* RenWeb::Window::hide() {
 #if defined(_WIN32)
-    spdlog::critical("fullscreen NOT IMPLEMENTED FOR windows");
+    HWND hwnd = GetActiveWindow();
+    ShowWindow(hwnd, SW_HIDE);
+    spdlog::critical("IN HIDE");
 #elif defined(__APPLE__)
     spdlog::critical("fullscreen NOT IMPLEMENTED FOR apple");
 #elif defined(__linux__)
@@ -240,7 +268,9 @@ RenWeb::Window* RenWeb::Window::hide() {
 
 RenWeb::Window* RenWeb::Window::show() {
 #if defined(_WIN32)
-    spdlog::critical("fullscreen NOT IMPLEMENTED FOR windows");
+    HWND hwnd = GetActiveWindow();
+    ShowWindow(hwnd, SW_SHOW);
+    spdlog::critical("IN SHOW");
 #elif defined(__APPLE__)
     spdlog::critical("fullscreen NOT IMPLEMENTED FOR apple");
 #elif defined(__linux__)
@@ -253,6 +283,9 @@ RenWeb::Window* RenWeb::Window::show() {
 std::vector<std::string> RenWeb::Window::openChooseFilesDialog(bool multi, bool dirs, RenWeb::ChooseFileDialogSettings* filtration) {
     std::vector<std::string> filepaths_vec{};
 #if defined(_WIN32)
+    boost::ignore_unused(multi);
+    boost::ignore_unused(dirs);
+    boost::ignore_unused(filtration);
     spdlog::critical("open file dialog NOT IMPLEMENTED FOR windows");
 #elif defined(__APPLE__)
     spdlog::critical("open file dialog NOT IMPLEMENTED FOR apple");
@@ -325,7 +358,7 @@ void RenWeb::Window::start() {
     this->refreshSettings()
         ->bindAll()
         ->reloadPage()
-        ->hide()
+        // ->hide()
         ->runWindow()
         ->terminateWindow()
         ->unbindAll();

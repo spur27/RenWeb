@@ -1,15 +1,5 @@
 #ifndef RENWEB_WINDOW_H
 #define RENWEB_WINDOW_H
-#if defined(_WIN32)
-#include <windows.h>
-using WindowHandle = HWND;
-#elif defined(__APPLE__)
-#include <Cocoa/Cocoa.h>
-using WindowHandle = NSWindow*;
-#elif defined(__linux__)
-#include <gtk/gtk.h>
-using WindowHandle = GtkWidget*;  // GtkWindow*
-#endif
 #include "info.hpp"
 #include "process_manager.hpp"
 #include "logger_addons.hpp"
@@ -24,6 +14,17 @@ using WindowHandle = GtkWidget*;  // GtkWindow*
 #include <map>
 #include <algorithm>
 #include <string>
+
+#if defined(_WIN32)
+#include <windows.h>
+using WindowHandle = HWND;
+#elif defined(__APPLE__)
+#include <Cocoa/Cocoa.h>
+using WindowHandle = NSWindow*;
+#elif defined(__linux__)
+#include <gtk/gtk.h>
+using WindowHandle = GtkWidget*;  // GtkWindow*
+#endif
 
 
 namespace RenWeb {

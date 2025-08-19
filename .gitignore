@@ -11,3 +11,4 @@ package-lock.json
 dist
 installers
 todo.txt
+*.pdb

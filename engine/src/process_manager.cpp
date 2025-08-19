@@ -114,27 +114,37 @@ void RenWeb::ProcessManager::bringToForeground(std::string process_name) {
     // pid_t child_pid = proc->id();
     try {
 #if defined(_WIN32)
-        // Windows: Enum all windows and bring one belonging to the PID to the front
-        bool CALLBACK EnumWindowsCallback(HWND hwnd, LPARAM lParam) {
-            DWORD pid = 0;
-            GetWindowThreadProcessId(hwnd, &pid);
-            if (pid == (DWORD)lParam && IsWindowVisible(hwnd)) {
-                SetForegroundWindow(hwnd);
-                return FALSE; // stop enumerating
-            }
-            return TRUE; // continue
+    struct EnumData {
+        DWORD pid;
+        HWND hwnd;
+    } data { proc->id(), nullptr };
+    EnumWindows([](HWND hwnd, LPARAM lParam) -> BOOL {
+        EnumData* pData = reinterpret_cast<EnumData*>(lParam);
+        DWORD windowPid;
+        GetWindowThreadProcessId(hwnd, &windowPid);
+        if (windowPid == pData->pid && GetWindow(hwnd, GW_OWNER) == nullptr && IsWindowVisible(hwnd)) {
+            pData->hwnd = hwnd;
+            return FALSE;
         }
-        EnumWindows(EnumWindowsCallback, child_pid);
+        return TRUE;
+    }, reinterpret_cast<LPARAM>(&data));
+    if (data.hwnd) {
+        ShowWindow(data.hwnd, ((IsIconic(data.hwnd) ? SW_RESTORE : SW_SHOW)));
+        SetForegroundWindow(data.hwnd);
+    } else {
+        spdlog::error("No window context");
+    }
 #elif defined(__APPLE__)
-        // macOS: Use AppleScript to bring process with PID to front
-        NSString *script = [NSString stringWithFormat:
-            @"tell application \"System Events\"\n"
-            "    set frontmost of the first process whose unix id is %d to true\n"
-            "end tell", child_pid];
-        NSAppleScript* appleScript = [[NSAppleScript alloc] initWithSource:script];
-        NSDictionary* errorInfo = nil;
-        [appleScript executeAndReturnError:&errorInfo];
-        [appleScript release];
+    // macOS: Use AppleScript to bring process with PID to front
+    // NSString *script = [NSString stringWithFormat:
+    //     @"tell application \"System Events\"\n"
+    //     "    set frontmost of the first process whose unix id is %d to true\n"
+    //     "end tell", child_pid];
+    // NSAppleScript* appleScript = [[NSAppleScript alloc] initWithSource:script];
+    // NSDictionary* errorInfo = nil;
+    // [appleScript executeAndReturnError:&errorInfo];
+    // [appleScript release];
+    spdlog::critical("bringToForefround is UNIMPLEMENTED");
 #elif defined(__linux__)
     spdlog::critical("bringToForefround is UNIMPLEMENTED");
 #endif
