@@ -26,7 +26,7 @@ RenWeb::Window::~Window() {
 }
 
 RenWeb::Window* RenWeb::Window::processContents() {
-    // this->set_html("<html\"><head><style>html { backgroundColor: black; width: 100vw; height: 100vh; }</style></head></html>");
+    this->set_html("<html\"><head><style>html { backgroundColor: black; width: 100vw; height: 100vh; }</style></head></html>");
 #if defined(_WIN32)
     spdlog::critical("hideUntilContentLoaded NOT IMPLEMENTED FOR apple");
 #elif defined(__APPLE__)
