@@ -19,6 +19,9 @@ jobs:
     - name: Set up Visual Studio
       uses: microsoft/setup-msbuild@v1.1
 
+    - name: Install boost
+      uses: choco install boost-msvc-14.1
+
     - name: npm install UI packages
       run: npm i
 
@@ -32,4 +35,4 @@ jobs:
     - name: make
       run: make run
       working-directory: ./engine
-      shell: bash
+      shell: sh
