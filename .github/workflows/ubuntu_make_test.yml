@@ -19,7 +19,7 @@ jobs:
     - name: npm install UI packages
       run: npm i
 
-    - name: npm install webpack packages
+    - name: npm install script packages
       run: npm i
       working-directory: ./scripts
 

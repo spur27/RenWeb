@@ -85,6 +85,15 @@ const linux = () => {
         logger.critical(e);
     }
     rmSync(debian_package_path, { recursive: true });
+    let output = createWriteStream(Path.join(linux_installer_dir, `${info.simple_name}.zip`));
+    let archive = archiver('zip');
+    output.on('close', () => {
+        logger.info(`Saved ${archive.pointer()} bytes to ./windows/${info.simple_name}.zip`);
+    });
+    archive.on('error', (err: Error) => {throw err});
+    archive.pipe(output);
+    archive.directory(Path.join(project_root_dir, 'build'), false);
+    archive.finalize();
 }
 
 const windows = () => {
@@ -203,7 +212,7 @@ SectionEnd
     output.on('close', () => {
         logger.info(`Saved ${archive.pointer()} bytes to ./windows/${info.simple_name}.zip`);
     });
-    archive.on('error', (err) => {throw err});
+    archive.on('error', (err: Error) => {throw err});
     archive.pipe(output);
     archive.directory(Path.join(project_root_dir, 'build'), false);
     archive.finalize();

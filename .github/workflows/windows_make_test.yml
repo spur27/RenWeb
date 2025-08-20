@@ -16,6 +16,23 @@ jobs:
       with:
         submodules: recursive
 
+    - name: Set up Visual Studio
+      uses: microsoft/setup-msbuild@v1.1
+
+    - name: Install python for boost compilation
+      run: |
+        choco install python3
+
+    - name: Download Boost source
+      run: |
+        git clone --branch boost-1.82.0 https://github.com/boostorg/boost.git
+
+    - name: Build Boost
+      run: |
+        cd boost
+        bootstrap.bat
+        .\b2.exe --toolset=msvc-14.2 --prefix="C:\boost" install
+
     - name: npm install UI packages
       run: npm i
 
@@ -25,10 +42,6 @@ jobs:
 
     - name: compile source libs
       run: npm run compile:ts
-
-    - name: install deps
-      run: choco install -y \
-        boost-msvc-14.3
         
     - name: make
       run: make run
