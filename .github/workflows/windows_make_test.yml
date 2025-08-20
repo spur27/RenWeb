@@ -26,7 +26,8 @@ jobs:
         version: 1.82.0
         libraries: filesystem program_options system
         platform: x64
-        configuration: Release
+        configuration: Debug
+        toolset: msvc
 
     - name: Show paths
       run: |
@@ -47,3 +48,4 @@ jobs:
     - name: make
       run: make run
       working-directory: ./engine
+      shell: bash
