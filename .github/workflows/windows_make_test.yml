@@ -19,15 +19,16 @@ jobs:
     - name: Set up Visual Studio
       uses: microsoft/setup-msbuild@v1.1
 
-    - name: Install Boost libraries
+    - name: Install Boost 1.82
       run: |
-        choco install boost-msvc -y
-
-    - name: Configure environment variables for Boost
+        Invoke-WebRequest -Uri https://boostorg.jfrog.io/artifactory/main/release/1.82.0/binaries/boost_1_82_0-msvc-14.2-64.exe -OutFile boost_installer.exe
+        Start-Process .\boost_installer.exe -ArgumentList "/quiet", "/dir=C:\boost_1_82" -Wait
+      
+    - name: Set up environment variables
       run: |
-        echo "BOOST_ROOT=C:\\ProgramData\\chocolatey\\lib\\boost-msvc\\tools\\build\\boost-msvc" >> $GITHUB_ENV
-        echo "BOOST_INCLUDE=C:\\ProgramData\\chocolatey\\lib\\boost-msvc\\tools\\build\\boost-msvc\\include" >> $GITHUB_ENV
-        echo "BOOST_LIB=C:\\ProgramData\\chocolatey\\lib\\boost-msvc\\tools\\build\\boost-msvc\\lib" >> $GITHUB_ENV
+        echo "BOOST_ROOT=C:\boost_1_82" >> $GITHUB_ENV
+        echo "BOOST_LIBRARYDIR=C:\boost_1_82\lib64-msvc-14.2" >> $GITHUB_ENV
+        echo "BOOST_INCLUDE=C:\boost_1_82" >> $GITHUB_ENV
 
     - name: npm install UI packages
       run: npm i
