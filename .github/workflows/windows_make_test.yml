@@ -21,9 +21,12 @@ jobs:
 
     - name: Install Boost 1.82
       run: |
-        Invoke-WebRequest -Uri https://boostorg.jfrog.io/artifactory/main/release/1.82.0/binaries/boost_1_82_0-msvc-14.2-64.exe -OutFile boost_installer.exe
-        Start-Process .\boost_installer.exe -ArgumentList "/quiet", "/dir=C:\boost_1_82" -Wait
-      
+        $boost_installer_path = "C:\boost_installer.exe"
+        Invoke-WebRequest -Uri https://boostorg.jfrog.io/artifactory/main/release/1.82.0/binaries/boost_1_82_0-msvc-14.2-64.exe -OutFile $boost_installer_path
+        if (-Not (Test-Path $boost_installer_path)) {
+          Write-Error "Boost installer not found!"
+        }
+        Start-Process -FilePath $boost_installer_path -ArgumentList "/quiet", "/dir=C:\boost_1_82" -Wait      
     - name: Set up environment variables
       run: |
         echo "BOOST_ROOT=C:\boost_1_82" >> $GITHUB_ENV
