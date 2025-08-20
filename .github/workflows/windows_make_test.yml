@@ -19,22 +19,6 @@ jobs:
     - name: Set up Visual Studio
       uses: microsoft/setup-msbuild@v1.1
 
-    - name: Build Boost
-      id: boost
-      uses: egor-tensin/build-boost@v1
-      with:
-        version: 1.82.0
-        libraries: filesystem program_options system
-        platform: x64
-        configuration: Debug
-        toolset: msvc
-
-    - name: Show paths
-      run: |
-        printf 'Boost has been unpacked to: %s\n' '${{ steps.boost.outputs.root }}'
-        printf 'Libraries can be found here: %s\n' '${{ steps.boost.outputs.librarydir }}'
-      shell: bash
-
     - name: npm install UI packages
       run: npm i
 
