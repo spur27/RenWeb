@@ -20,19 +20,7 @@ jobs:
       uses: microsoft/setup-msbuild@v1.1
 
     - name: Install boost
-      run: |
-        $installer_url = "https://sourceforge.net/projects/boost/files/boost-binaries/1.82.0/boost_1_82_0-msvc-14.3-64.exe/download"
-        $installer_path = "C:\boost-installer.exe"
-        Invoke-WebRequest -Uri $installer_url -OutFile $installer_path
-        if (-Not (Test-Path $installer_path)) {
-          Write-Error "Installer not found at $installer_path"
-          exit 1
-        }
-
-    - name: Run boost installer
-      run: |
-        $installer_path = "C:\boost-installer.exe"
-        Start-Process -FilePath $installer_path -ArgumentList "/silent", "/dir=C:\install-dir" -Wait
+      run: choco install boost-msvc-14.1
 
     - name: npm install UI packages
       run: npm i
@@ -45,6 +33,9 @@ jobs:
       run: npm run compile:ts
         
     - name: make
-      run: make run
+      run: |
+        git --version
+        ls
+        bash -c "make"
       working-directory: ./engine
-      shell: sh
+      shell: bash
