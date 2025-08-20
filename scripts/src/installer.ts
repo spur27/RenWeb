@@ -88,7 +88,7 @@ const linux = () => {
     let output = createWriteStream(Path.join(linux_installer_dir, `${info.simple_name}.zip`));
     let archive = archiver('zip');
     output.on('close', () => {
-        logger.info(`Saved ${archive.pointer()} bytes to ./windows/${info.simple_name}.zip`);
+        logger.info(`Saved ${archive.pointer()} bytes to ./linux/${info.simple_name}.zip`);
     });
     archive.on('error', (err: Error) => {throw err});
     archive.pipe(output);
