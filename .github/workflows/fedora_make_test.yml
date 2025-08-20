@@ -28,13 +28,12 @@ jobs:
     - name: npm install UI packages
       run: npm i
 
-    - name: npm install webpack packages
+    - name: npm install script packages
       run: npm i
       working-directory: ./scripts
 
     - name: compile source libs
-      run: npx tsc
-      working-directory: ./src
+      run: npm run compile:ts
 
     - name: install dependencies
       run: |

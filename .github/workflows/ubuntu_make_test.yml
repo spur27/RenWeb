@@ -24,8 +24,7 @@ jobs:
       working-directory: ./scripts
 
     - name: compile source libs
-      run: npx tsc
-      working-directory: ./src
+      run: npm run compile:ts
 
     - name: install dependencies
       run: |
