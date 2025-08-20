@@ -19,19 +19,15 @@ jobs:
     - name: Set up Visual Studio
       uses: microsoft/setup-msbuild@v1.1
 
-    - name: Install python for boost compilation
+    - name: Install Boost libraries
       run: |
-        choco install python3
+        choco install boost-msvc -y
 
-    - name: Download Boost source
+    - name: Configure environment variables for Boost
       run: |
-        git clone --branch boost-1.82.0 https://github.com/boostorg/boost.git
-
-    - name: Build Boost
-      run: |
-        cd boost
-        bootstrap.bat
-        .\b2.exe --toolset=msvc-14.2 --prefix="C:\boost" install
+        echo "BOOST_ROOT=C:\\ProgramData\\chocolatey\\lib\\boost-msvc\\tools\\build\\boost-msvc" >> $GITHUB_ENV
+        echo "BOOST_INCLUDE=C:\\ProgramData\\chocolatey\\lib\\boost-msvc\\tools\\build\\boost-msvc\\include" >> $GITHUB_ENV
+        echo "BOOST_LIB=C:\\ProgramData\\chocolatey\\lib\\boost-msvc\\tools\\build\\boost-msvc\\lib" >> $GITHUB_ENV
 
     - name: npm install UI packages
       run: npm i
