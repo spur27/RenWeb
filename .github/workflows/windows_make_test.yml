@@ -29,9 +29,6 @@ jobs:
       with:
         nsis-version: '3.10'
 
-    - name: Install 7zip
-      run: choco install 7zip -y
-
     - name: Get boost installer
       run: |
         curl -L https://github.com/MarkusJx/prebuilt-boost/releases/download/1.82.0/boost-1.82.0-windows-2022-msvc-static-x86.tar.gz -o C:\boost_1_82_0.tar.gz
@@ -39,8 +36,9 @@ jobs:
         
     - name: Run boost installer
       run: |
-        7z x C:\boost_1_82_0.tar.gz -oC:\local\boost_1_82_0  -snld    
+        tar -xzf C:\boost_1_82_0.tar.gz -C C:\local
         dir "C:\"
+        dir "C:\local"
         dir "C:\local\boost_1_82_0"
     
     - name: Install boost
