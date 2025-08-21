@@ -31,15 +31,15 @@ jobs:
         
     - name: Run boost installer
       run: |
-        Start-Process -FilePath "C:\boost_1_82_0.exe" -ArgumentList '/S' -NoNewWindow -Wait
+        C:\boost_1_82_0.exe /S /V3
         dir "C:\"
-        dir "C:\boost"
+        dir "C:\local\boost_1_82_0"
     
     - name: Set Boost paths
       run: |
         dir
-        echo "INCLUDE=C:\ProgramData\chocolatey\lib\boost-msvc-14.1\unpacked\tools\boost\include;$env:INCLUDE" >> $env:GITHUB_ENV
-        echo "LIB=C:\ProgramData\chocolatey\lib\boost-msvc-14.1\unpacked\tools\boost\lib;$env:LIB" >> $env:GITHUB_ENV
+        echo "INCLUDE=C:\local\boost_1_82_0;$env:INCLUDE" >> $env:GITHUB_ENV
+        echo "LIB=C:\local\boost_1_82_0\lib64-msvc-14.1;$env:LIB" >> $env:GITHUB_ENV
         echo $INCLUDE
         echo $LIB
 
