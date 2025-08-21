@@ -24,9 +24,6 @@ jobs:
       with:
         arch: x64
 
-    - name: Install 7zip
-      run: choco install 7zip -y
-
     - name: Install boost
       run: |
         curl -L https://sourceforge.net/projects/boost/files/boost-binaries/1.82.0/boost_1_82_0-msvc-14.1-64.exe/download -o C:\boost_1_82_0.zip
@@ -34,6 +31,7 @@ jobs:
         
     - name: Unzip boost package
       run: |
+        dir "C:\"
         Expand-Archive -Path "C:\boost_1_82_0.zip" -DestinationPath "C:\boost"
         dir "C:\"
         dir "C:\boost"
