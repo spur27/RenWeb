@@ -31,7 +31,7 @@ jobs:
         
     - name: Run boost installer
       run: |
-        C:\boost_1_82_0.exe /S
+        Start-Process -FilePath "C:\boost_1_82_0.exe" -ArgumentList '/S' -NoNewWindow -Wait
         dir "C:\"
         dir "C:\boost"
     
