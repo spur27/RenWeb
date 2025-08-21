@@ -48,12 +48,11 @@ jobs:
         # A list of supported versions can be found here:
         # https://github.com/MarkusJx/prebuilt-boost/blob/main/versions-manifest.json
         boost_version: 1.82.0
-        # OPTIONAL: Specify a custon install location
-        boost_install_dir: .\
         # OPTIONAL: Specify a platform version
         platform_version: 2022
         # OPTIONAL: Specify a toolset
         toolset: msvc
+        link: static
 
     - name: Try input
       run: |
