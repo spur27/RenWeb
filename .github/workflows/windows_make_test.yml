@@ -27,8 +27,9 @@ jobs:
     - name: Install boost
       run: |
         $url = "https://netcologne.dl.sourceforge.net/project/boost/boost-binaries/1.82.0/boost_1_82_0-msvc-14.1-64.exe"
-        Invoke-WebRequest -Uri $url -OutFile boost.exe
+        Invoke-WebRequest -Uri $url -OutFile boost.exe -MaximumRedirection 100
         # 7z x boost.exe -oC:\boost
+
     - name: test
       run: Get-Item boost.exe | Select-Object Name,Length
 
