@@ -38,19 +38,16 @@ jobs:
       run: |
         tar -xzf C:\boost_1_82_0.tar.gz -C C:\
         dir "C:\boost"
-        tar -xzf C:\boost]boost_1_82_0.tar -C C:\boost_dir
-        dir "C:\"
+        dir "C:\boost\boost"
+        dir "C:\boost\include"
+        dir "C:\boost\lib"
+        dir "C:\boost\libs"
     
-    - name: Try input
-      run: |
-        dir
-        dir C:\
-
     - name: Set Boost paths
       run: |
         dir
-        echo "INCLUDE=C:\local\boost_1_82_0;$env:INCLUDE" >> $env:GITHUB_ENV
-        echo "LIB=C:\local\boost_1_82_0\lib64-msvc-14.1;$env:LIB" >> $env:GITHUB_ENV
+        echo "INCLUDE=C:\boost;$env:INCLUDE" >> $env:GITHUB_ENV
+        echo "LIB=C:\boost\lib;$env:LIB" >> $env:GITHUB_ENV
         echo $INCLUDE
         echo $LIB
 
