@@ -25,13 +25,7 @@ jobs:
         arch: x64
 
     - name: Install boost
-      run: |
-        $url = "https://netcologne.dl.sourceforge.net/project/boost/boost-binaries/1.82.0/boost_1_82_0-msvc-14.1-64.exe"
-        Invoke-WebRequest -Uri $url -OutFile boost.exe -MaximumRedirection 100
-        # 7z x boost.exe -oC:\boost
-
-    - name: test
-      run: Get-Item boost.exe | Select-Object Name,Length
+      run: choco install boost-msvc-14.1
 
     - name: Unzip boost package
       run: |
@@ -40,6 +34,8 @@ jobs:
     - name: Set Boost paths
       run: |
         dir C:\ProgramData\chocolatey\lib\boost-msvc-14.1
+        dir C:\ProgramData\chocolatey\lib\boost-msvc-14.1\tools
+        dir C:\ProgramData\chocolatey\lib\boost-msvc-14.1\unpacked
         dir C:\ProgramData\chocolatey\lib\boost-msvc-14.1\unpacked\package
         echo "INCLUDE=C:\ProgramData\chocolatey\lib\boost-msvc-14.1\unpacked\tools\boost\include;$env:INCLUDE" >> $env:GITHUB_ENV
         echo "LIB=C:\ProgramData\chocolatey\lib\boost-msvc-14.1\unpacked\tools\boost\lib;$env:LIB" >> $env:GITHUB_ENV
