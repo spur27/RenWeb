@@ -27,9 +27,9 @@ jobs:
     - name: Install boost
       run: |
         $url = "https://sourceforge.net/projects/boost/files/boost-binaries/1.82.0/boost_1_82_0-msvc-14.1-64.exe/download"
-        Invoke-WebRequest -Uri $url -OutFile "boost.exe"
-        dir
-        Start-Process -FilePath "boost.exe" -NoNewWindow -Wait
+        $url = "https://sourceforge.net/projects/boost/files/boost-binaries/1.82.0/boost_1_82_0-msvc-14.1-64.exe/download"
+        Invoke-WebRequest -Uri $url -OutFile "boost.exe" -MaximumRedirection 5
+        7z x boost.exe -oC:\boost
 
     - name: Unzip boost package
       run: |
