@@ -27,11 +27,15 @@ jobs:
     - name: Install boost
       run: choco install boost-msvc-14.1
 
+    - name: Unzip boost package
+      run: |
+        Expand-Archive -Path "C:\ProgramData\chocolatey\lib\boost-msvc-14.1\boost-msvc-14.1.nupkg" ` -DestinationPath "C:\ProgramData\chocolatey\lib\boost-msvc-14.1\unpacked"
+
     - name: Set Boost paths
       run: |
-        dir C:\ProgramData\chocolatey\lib\boost-msvc-14.1
-        echo "INCLUDE=C:\ProgramData\chocolatey\lib\boost-msvc-14.1\tools\boost\include;%INCLUDE%" >> $env:GITHUB_ENV
-        echo "LIB=C:\ProgramData\chocolatey\lib\boost-msvc-14.1\lib;%LIB%" >> $env:GITHUB_ENV
+        dir C:\ProgramData\chocolatey\lib\boost-msvc-14.1\unpacked
+        echo "INCLUDE=C:\ProgramData\chocolatey\lib\boost-msvc-14.1\unpacked\tools\boost\include;%INCLUDE%" >> $env:GITHUB_ENV
+        echo "LIB=C:\ProgramData\chocolatey\lib\boost-msvc-14.1\unpacked\lib;%LIB%" >> $env:GITHUB_ENV
 
     - name: npm install UI packages
       run: npm i
