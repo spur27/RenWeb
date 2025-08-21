@@ -24,17 +24,35 @@ jobs:
       with:
         arch: x64
 
-    - name: Get boost installer
-      run: |
-        curl -L https://sourceforge.net/projects/boost/files/boost-binaries/1.82.0/boost_1_82_0-msvc-14.1-64.exe/download -o C:\boost_1_82_0.exe
-        # Get-Content C:\boost_1_82_0.zip -TotalCount 50
+    # - name: Get boost installer
+    #   run: |
+    #     curl -L https://sourceforge.net/projects/boost/files/boost-binaries/1.82.0/boost_1_82_0-msvc-14.1-64.exe/download -o C:\boost_1_82_0.exe
+    #     # Get-Content C:\boost_1_82_0.zip -TotalCount 50
         
-    - name: Run boost installer
-      run: |
-        Start-Process -FilePath "C:\boost_1_82_0.exe" -ArgumentList '/S','/D=C:\local\boost_1_82_0' -Wait -NoNewWindow        
-        dir "C:\"
-        dir "C:\local\boost_1_82_0"
+    # - name: Run boost installer
+    #   run: |
+    #     Start-Process -FilePath "C:\boost_1_82_0.exe" -ArgumentList '/S','/D=C:\local\boost_1_82_0' -Wait -NoNewWindow        
+    #     dir "C:\"
+    #     dir "C:\local\boost_1_82_0"
     
+    - name: Install boost
+      uses: MarkusJx/install-boost@v2
+      id: install-boost
+      with:
+        # REQUIRED: Specify the required boost version
+        # A list of supported versions can be found here:
+        # https://github.com/MarkusJx/prebuilt-boost/blob/main/versions-manifest.json
+        boost_version: 1.82.0
+        # OPTIONAL: Specify a custon install location
+        boost_install_dir: C:\boost
+        # OPTIONAL: Specify a platform version
+        # platform_version: 2019
+        # OPTIONAL: Specify a toolset
+        toolset: msvc
+
+        # NOTE: If a boost version matching all requirements cannot be found,
+        # this build step will fail
+
     - name: Set Boost paths
       run: |
         dir
