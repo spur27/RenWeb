@@ -23,7 +23,7 @@ export class Logger {
 
     constructor(script_name: string, log_to_file=false, log_level: number=LogLevel.DEBUG, color?: (...args: any[]) => {}) {
         this.script_name = script_name;
-        this.log_file_path = Path.join(import.meta.dirname, `../../../build/log_${this.script_name.trim().toLocaleLowerCase().replace(/\s/, "_")}.txt`);
+        this.log_file_path = Path.join(import.meta.dirname, `../../build/log_${this.script_name.trim().toLocaleLowerCase().replace(/\s/, "_")}.txt`);
         this.log_to_file = log_to_file;
         this.log_level = log_level;
         if (color != null && color != undefined) {

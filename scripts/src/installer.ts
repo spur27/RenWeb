@@ -1,21 +1,14 @@
 // add webview stuff
-import { rmSync, lstatSync, existsSync, mkdirSync, writeFileSync, copyFile, cpSync, mkdir, copyFileSync, chmodSync, readFileSync } from 'fs';
+import { rmSync, lstatSync, existsSync, mkdirSync, writeFileSync, copyFile, cpSync, mkdir, copyFileSync, chmodSync, readFileSync, renameSync, createWriteStream } from 'fs';
 import Path from 'path';
 import os from 'os';
-import { LogLevel, Logger } from '../lib/logger/logger.ts';
+import { LogLevel, Logger } from '../lib/logger.ts';
 import Chalk from 'chalk';
 import { execSync, spawn } from 'child_process';
+import { getInfo, Info } from '../lib/info.ts';
+import archiver from 'archiver';
 
 const logger = new Logger("Installer", false, LogLevel.TRACE, Chalk.bold.magenta);
-
-type Info = {
-    name: string,
-    simple_name: string,
-    version: string,
-    description: string,
-    license: string,
-    author: string
-};
 
 const throwCriticalError = (msg: any) => {
     logger.critical(msg);
@@ -38,63 +31,12 @@ const os_type: string = os.type();
 const os_machine: string = os.machine();
 
 logger.info(`OS is of type ${Chalk.bold(os_type)} of machine ${Chalk.bold(os_machine)}`);
-let info_cpp: string = "";
-const info_cpp_path = Path.join(project_root_dir, "engine", "include", "info.hpp");
-try {
-    info_cpp = readFileSync(info_cpp_path, "utf8");
-} catch (e) {
-    logger.critical(e);
-    process.exit(-1);
-}
 
-const info: Info = {
-    name: ((regex_arr: (RegExpMatchArray | null)): string => {
-        if (regex_arr == null || (regex_arr as RegExpMatchArray)[1] == null) {
-            logger.error(`#define RENWEB_INFO_DEFAULT_NAME not found in "${info_cpp_path}". Setting to "RenWeb"`);
-            return "RenWeb";
-        } else {
-            return (regex_arr as RegExpMatchArray)[1] as string; 
-        }
-    })(info_cpp.match(/#define\sRENWEB_INFO_DEFAULT_NAME\s\"(.*)\"/)),
-    simple_name: "",
-    version: ((regex_arr: (RegExpMatchArray | null)): string => {
-        if (regex_arr == null || (regex_arr as RegExpMatchArray)[1] == null) {
-            logger.error(`#define RENWEB_INFO_DEFAULT_VERSION not found in "${info_cpp_path}". Setting to "v0.0 (default)"`);
-            return "v0.0 (default)";
-        } else {
-            return (regex_arr as RegExpMatchArray)[1] as string; 
-        }
-    })(info_cpp.match(/#define\sRENWEB_INFO_DEFAULT_VERSION\s\"(.*)\"/)),
-    description: ((regex_arr: (RegExpMatchArray | null)): string => {
-        if (regex_arr == null || (regex_arr as RegExpMatchArray)[1] == null) {
-            logger.error(`#define RENWEB_INFO_DEFAULT_DESCRIPTION not found in "${info_cpp_path}". Setting to "I am a default description"`);
-            return "I am a default description";
-        } else {
-            return (regex_arr as RegExpMatchArray)[1] as string; 
-        }
-    })(info_cpp.match(/#define\sRENWEB_INFO_DEFAULT_DESCRIPTION\s\"(.*)\"/)),
-    license: ((regex_arr: (RegExpMatchArray | null)): string => {
-        if (regex_arr == null || (regex_arr as RegExpMatchArray)[1] == null) {
-            logger.error(`#define RENWEB_INFO_DEFAULT_LICENSE not found in "${info_cpp_path}". Setting to "Unknown"`);
-            return "Unknown";
-        } else {
-            return (regex_arr as RegExpMatchArray)[1] as string; 
-        }
-    })(info_cpp.match(/#define\sRENWEB_INFO_DEFAULT_LICENSE\s\"(.*)\"/)),
-    author: ((regex_arr: (RegExpMatchArray | null)): string => {
-        if (regex_arr == null || (regex_arr as RegExpMatchArray)[1] == null) {
-            logger.error(`#define RENWEB_INFO_DEFAULT_AUTHOR not found in "${info_cpp_path}". Setting to "Creature"`);
-            return "Creature";
-        } else {
-            return (regex_arr as RegExpMatchArray)[1] as string; 
-        }
-    })(info_cpp.match(/#define\sRENWEB_INFO_DEFAULT_AUTHOR\s\"(.*)\"/)),
-};
-info.simple_name = info.name.trim().replaceAll(/\s/g, "-").toLowerCase();
+const info: Info = getInfo();
 
 const linux = () => {
     const linux_installer_dir = Path.join(installer_dir, "linux");
-    const icon_path = Path.join(project_root_dir, "engine", "ico", `${info.simple_name}.ico`);
+    const icon_path = Path.join(project_root_dir, "engine", "resource", `app.ico`);
     const debian_path = Path.join(linux_installer_dir, "debian");
     const debian_package_path = Path.join(debian_path,  info.simple_name);
     const debian_lib_path = Path.join(debian_package_path, "usr", "local", "lib", info.simple_name);
@@ -102,10 +44,11 @@ const linux = () => {
     const debian_dir_path = Path.join(debian_package_path, "DEBIAN");
     const debian_icon_path = Path.join(debian_package_path, "usr", "share", "icons", `${info.simple_name}.ico`);
     const debian_bin_path = Path.join(debian_package_path, "usr", "local", "bin");
-    if (!existsSync(linux_installer_dir)) {
-        logger.warn(`Linux installer dir doesn't exist at '${linux_installer_dir}'. Making one...`);
-        mkdirSync(linux_installer_dir);
+    if (existsSync(linux_installer_dir)) {
+        logger.warn(`Linux installer dir already exist at '${linux_installer_dir}'. Clearing...`);
+        rmSync(linux_installer_dir, { recursive: true });
     }
+    mkdirSync(linux_installer_dir);
   // DEBIAN
     logger.info("Creating debian package...");
     if (existsSync(debian_path)) {
@@ -144,24 +87,145 @@ const linux = () => {
     rmSync(debian_package_path, { recursive: true });
 }
 
+const windows = () => {
+    const windows_installer_dir = Path.join(installer_dir, "windows");
+    const nsis_dir = Path.join(windows_installer_dir, "nsis");
+    if (existsSync(windows_installer_dir)) {
+        logger.warn(`Windows installer dir already exist at '${windows_installer_dir}'. Clearing...`);
+        rmSync(windows_installer_dir, { recursive: true });
+    }
+    mkdirSync(windows_installer_dir);
+    mkdirSync(nsis_dir);
+    logger.info(`Writing setup wizard to '${Path.join(nsis_dir, 'setup_wizard.nsi')}`);
+writeFileSync(Path.join(nsis_dir, 'setup_wizard.nsi'),
+`
+;--------------------------------
+; ${info.name} NSIS Setup Wizard
+;--------------------------------
+
+${(existsSync(Path.join(project_root_dir, 'engine', 'resource', 'app.ico')))
+    ?
+`
+!define MUI_ICON "../../../engine/resource/app.ico"       ; Installer icon
+!define MUI_UNICON "../../../engine/resource/app.ico"     ; Uninstaller icon
+`
+    : ""}
+
+!include "MUI2.nsh"
+!include "nsDialogs.nsh"
+!include "WinMessages.nsh"
+
+Var MAIN_EXE 
+Var CREATE_DESKTOP_SHORTCUT
+
+Name "${info.name}"
+OutFile "${info.simple_name}-installer.exe"
+InstallDir "$LOCALAPPDATA\\${info.name}"
+RequestExecutionLevel user
+!insertmacro MUI_PAGE_WELCOME
+${(existsSync(Path.join(project_root_dir, 'engine', 'resource', 'LICENSE.txt')))
+    ? `"!insertmacro MUI_PAGE_LICENSE "../../../engine/resource/LICENSE.txt"` : ""
+}
+!insertmacro MUI_PAGE_DIRECTORY
+Page custom DesktopShortcutPage DesktopShortcutPageLeave
+!insertmacro MUI_PAGE_INSTFILES
+!define MUI_FINISHPAGE_RUN "$INSTDIR\\${info.simple_name}.exe"
+!define MUI_FINISHPAGE_RUN_TEXT "Run ${info.name}"
+!insertmacro MUI_PAGE_FINISH
+
+!insertmacro MUI_LANGUAGE "English"
+
+Function DesktopShortcutPage
+  nsDialogs::Create 1018
+  Pop $0
+  \${If} $0 == error
+    Abort
+  \${EndIf}
+  !insertmacro MUI_HEADER_TEXT "Shortcut Options" "Choose which shortcuts to create"
+  \${NSD_CreateCheckBox} 0u 0u 100% 12u "Create a desktop shortcut"
+  Pop $CREATE_DESKTOP_SHORTCUT
+  \${NSD_SetState} $CREATE_DESKTOP_SHORTCUT \${BST_CHECKED}
+  nsDialogs::Show
+FunctionEnd
+Function DesktopShortcutPageLeave
+    \${NSD_GetState} $CREATE_DESKTOP_SHORTCUT $CREATE_DESKTOP_SHORTCUT
+FunctionEnd
+
+; ----------------------------
+Section "Install"
+  StrCpy $MAIN_EXE "${info.simple_name}.exe"
+
+  SetOutPath "$INSTDIR"
+
+  File /r "../../../build\\*.*"
+
+  CreateDirectory "$SMPROGRAMS\\${info.name}"
+  \${If} $CREATE_DESKTOP_SHORTCUT == \${BST_CHECKED}
+    CreateShortCut "$DESKTOP\\${info.name}.lnk" "$INSTDIR\\$MAIN_EXE" "" "" "" SW_SHOWNORMAL "" "${info.author}.${info.name_no_whitespace}"
+  \${EndIf}
+
+  CreateShortCut "$SMPROGRAMS\\${info.name}\\${info.name}.lnk" "$INSTDIR\\$MAIN_EXE" "" "" "" SW_SHOWNORMAL "" "${info.author}.${info.name_no_whitespace}"
+
+  WriteUninstaller "$INSTDIR\\uninstall.exe"
+
+  WriteRegStr HKCU "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${info.name_no_whitespace}" "DisplayName" "${info.name}"
+  WriteRegStr HKCU "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${info.name_no_whitespace}" "DisplayVersion" "${info.version}"
+  WriteRegStr HKCU "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${info.name_no_whitespace}" "Publisher" "${info.author}"
+  WriteRegStr HKCU "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${info.name_no_whitespace}" "InstallLocation" "$INSTDIR"
+  WriteRegStr HKCU "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${info.name_no_whitespace}" "UninstallString" "$INSTDIR\\uninstall.exe"
+
+SectionEnd
+; ----------------------------
+Section "Uninstall"
+
+  ; Remove all installed files and folders
+  RMDir /r "$INSTDIR"
+
+  ; Remove shortcuts
+  Delete "$DESKTOP\\${info.name}.lnk"
+  Delete "$SMPROGRAMS\\${info.name}\\${info.name}.lnk"
+  RMDir "$SMPROGRAMS\\${info.name}"
+
+  ; Remove registry uninstall info
+  DeleteRegKey HKCU "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${info.name_no_whitespace}"
+
+SectionEnd
+; ----------------------------
+
+!define MUI_ABORTWARNING
+`
+);
+    execSync("makensis ../installers/windows/nsis/setup_wizard.nsi", { stdio: 'inherit' });
+    renameSync(Path.join(nsis_dir, `${info.simple_name}-installer.exe`), Path.join(windows_installer_dir, `${info.simple_name}-installer.exe`));
+    rmSync(nsis_dir, { recursive: true });
+    let output = createWriteStream(Path.join(windows_installer_dir, `${info.simple_name}.zip`));
+    let archive = archiver('zip');
+    output.on('close', () => {
+        logger.info(`Saved ${archive.pointer()} bytes to ./windows/${info.simple_name}.zip`);
+    });
+    archive.on('error', (err) => {throw err});
+    archive.pipe(output);
+    archive.directory(Path.join(project_root_dir, 'build'), false);
+    archive.finalize();
+}
+
 try {
-    execSync("cd ../ && npm run script:build && npm run make clean && npm run make TARGET=release", { stdio: 'inherit' });
+    switch (os_type) {
+        case "Linux":
+            execSync("cd ../ && npm run script:build && npm run make clean && npm run make TARGET=release", { stdio: 'inherit' });
+            linux();
+            break;
+        case "Darwin":
+            break;
+        case "Windows_NT":
+            execSync("cd ..\\ && npm run script:build && npm run make clean && npm run make TARGET=release", { stdio: 'inherit' });
+            windows();
+            break;
+        default:
+            logger.critical(`unknown OS type: ${os_type}`);
+            break;
+    }
 } catch (e) {
     logger.critical(e);
-    process.exit(-1);
 }
-
-switch (os_type) {
-    case "Linux":
-        linux();
-        break;
-    case "Darwin":
-        break;
-    case "Windows_NT":
-        break;
-    default:
-        logger.critical(`unknown OS type: ${os_type}`);
-        break;
-}
-
 

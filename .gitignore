@@ -12,3 +12,4 @@ dist
 installers
 todo.txt
 *.pdb
+*.rc

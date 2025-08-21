@@ -1,9 +1,4 @@
 #include "../include/window.hpp"
-#include "gdk/gdk.h"
-#include "gtk/gtk.h"
-#include "webview/detail/platform/linux/webkitgtk/compat.hh"
-#include <boost/core/ignore_unused.hpp>
-#include <boost/date_time/posix_time/posix_time_duration.hpp>
  
 RenWeb::Window::Window(unsigned short thread_cnt, unsigned short port)
   : webview::webview(false, nullptr)
@@ -28,7 +23,8 @@ RenWeb::Window::~Window() {
 RenWeb::Window* RenWeb::Window::processContents() {
     this->set_html("<html\"><head><style>html { backgroundColor: black; width: 100vw; height: 100vh; }</style></head></html>");
 #if defined(_WIN32)
-    spdlog::critical("hideUntilContentLoaded NOT IMPLEMENTED FOR apple");
+    // this->hide();
+    this->reloadPage();
 #elif defined(__APPLE__)
     spdlog::critical("hideUntilContentLoaded NOT IMPLEMENTED FOR apple");
 #elif defined(__linux__)

@@ -1,4 +1,3 @@
-SHELL := /usr/bin/bash
 # -----------------------------------------------------------------------------
 # Toolchain prefix
 # -		ARM 32-bit (Linux): 		   CROSS_COMPILE := arm-linux-gnueabihf-
@@ -28,6 +27,7 @@ endif
 # OS info
 # -----------------------------------------------------------------------------
 ifeq ($(OS),Windows_NT)
+	SHELL := C:\Program Files\Git\bin\bash.exe
     OS_NAME := Windows
 	EXE_EXT := .exe
 	OBJ_EXT := .obj
@@ -39,6 +39,7 @@ ifeq ($(OS),Windows_NT)
 		CXXFLAGS += /EHsc /O2 /MT
 	endif
 else
+	SHELL := /bin/bash
     UNAME_S := $(shell uname -s)
 	EXE_EXT :=
 	OBJ_EXT := .o
@@ -78,6 +79,9 @@ BOLD   := \033[1m
 define describe
 	@printf "$(GREEN)$(BOLD)%s$(RESET) %s\n" "$(1)" "$(2)"
 endef
+define warn
+	@printf "$(YELLOW)$(BOLD)%s$(RESET) %s\n" "$(1)" "$(2)"
+endef
 define step
 	@printf "$(CYAN)$(BOLD)%s$(RESET) %s\n" "$(1)" "$(2)"
 endef
@@ -95,7 +99,8 @@ OBJ_PATH :=    $(SRC_PATH)/.build
 INC_PATH :=    ./include
 EXTERN_INC_PATHS := \
 	$(addprefix -I, $(wildcard external/*/include)) \
-	$(addprefix -I, external/webview/core/include) \
+	$(addprefix -I, external/webview/core/include)
+RC_PATH :=    ./src/.build/app.res
 # -----------------------------------------------------------------------------
 # Static Linked Libraries
 # -----------------------------------------------------------------------------
@@ -128,7 +133,8 @@ all: $(BUILD_PATH)/$(EXE)
 $(BUILD_PATH)/$(EXE): $(OBJS) | $(BUILD_PATH)
 	$(call step,Linking Executable,$@)
 ifeq ($(OS_NAME),Windows)
-	$(CXX) $(OBJS) $(CXXFLAGS) /link /SUBSYSTEM:CONSOLE /OUT:$@
+	npm run script:gen_resource
+	$(CXX) $(OBJS) ./src/.build/app.res $(CXXFLAGS) /link /SUBSYSTEM:WINDOWS /OUT:$@
 else 
 	$(CXX) $(CXXFLAGS) $(PKG_CFLAGS) -I$(INC_PATH) $(EXTERN_INC_PATHS) $^ $(LIBS) $(PKG_LIBS) -o $@
 endif
@@ -170,7 +176,7 @@ clean:
 	-not -path '$(BUILD_PATH)/content/*' \
 	-not -path '$(BUILD_PATH)/content' \
 	-exec rm -rf {} +
-	rm -rf $(OBJ_PATH)/*$(OBJ_EXT)
+	rm -rf $(OBJ_PATH)/*
 	$(call step,Cleaning [DONE])
 # -----------------------------------------------------------------------------
 # COMMAND: Run the program

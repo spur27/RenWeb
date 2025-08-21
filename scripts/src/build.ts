@@ -3,7 +3,7 @@ import webpack from 'webpack';
 import TerserWebpackPlugin from 'terser-webpack-plugin';
 import { readdirSync, lstatSync } from 'fs';
 import Path from 'path';
-import { LogLevel, Logger } from '../lib/logger/logger.ts';
+import { LogLevel, Logger } from '../lib/logger.ts';
 import Chalk from 'chalk';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
