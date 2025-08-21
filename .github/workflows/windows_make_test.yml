@@ -39,7 +39,7 @@ jobs:
         
     - name: Run boost installer
       run: |
-        7z x C:\boost_1_82_0.tar.gz -oC:\local\boost_1_82_0        
+        7z x C:\boost_1_82_0.tar.gz -oC:\local\boost_1_82_0  -snld    
         dir "C:\"
         dir "C:\local\boost_1_82_0"
     
