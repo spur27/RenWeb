@@ -30,13 +30,13 @@ jobs:
     - name: Install boost
       run: |
         curl -L https://archives.boost.io/release/1.82.0/source/boost_1_82_0.zip -o C:\boost_1_82_0.zip
-        Get-Content C:\boost_1_82_0.zip -TotalCount 10
         
     - name: Unzip boost package
       run: |
         dir "C:\"
-        Expand-Archive -Path ".\boost_1_82_0.zip" -DestinationPath ".\boost"
-        dir
+        Expand-Archive -Path "C:\boost_1_82_0.zip" -DestinationPath "C:\boost"
+        dir "C:\"
+        dir "C:\boost"
     
     - name: Set Boost paths
       run: |
