@@ -45,7 +45,7 @@ jobs:
     - name: Set webview headers
       run: |
         echo "INCLUDE=C:\webview2\build\native\include;$env:INCLUDE" >> $env:GITHUB_ENV
-        echo "LIB=C:\webview2\build\native\*\x64\*.lib;$env:LIB" >> $env:GITHUB_ENV=
+        echo "LIB=C:\webview2\build\native\*\x64\*.lib;$env:LIB" >> $env:GITHUB_ENV
 
     - name: Get and unzip boost
       run: |
