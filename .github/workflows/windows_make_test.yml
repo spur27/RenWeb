@@ -31,7 +31,7 @@ jobs:
         
     - name: Run boost installer
       run: |
-        C:\boost_1_82_0.exe /S /V3
+        & "C:\boost_1_82_0.exe" /S /V3
         dir "C:\"
         dir "C:\local\boost_1_82_0"
     
