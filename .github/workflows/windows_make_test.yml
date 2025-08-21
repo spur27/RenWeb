@@ -36,25 +36,11 @@ jobs:
         
     - name: Run boost installer
       run: |
-        tar -xzf C:\boost_1_82_0.tar.gz -C C:\local
+        tar -xzf C:\boost_1_82_0.tar.gz
         dir "C:\"
         dir "C:\local"
         dir "C:\local\boost_1_82_0"
     
-    - name: Install boost
-      uses: MarkusJx/install-boost@v2
-      id: install-boost
-      with:
-        # REQUIRED: Specify the required boost version
-        # A list of supported versions can be found here:
-        # https://github.com/MarkusJx/prebuilt-boost/blob/main/versions-manifest.json
-        boost_version: 1.82.0
-        # OPTIONAL: Specify a platform version
-        platform_version: 2022
-        # OPTIONAL: Specify a toolset
-        toolset: msvc
-        link: static
-
     - name: Try input
       run: |
         dir
