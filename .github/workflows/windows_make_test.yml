@@ -28,14 +28,12 @@ jobs:
       run: choco install 7zip -y
 
     - name: Install boost
-      run: |
-        Invoke-WebRequest `
-          -Uri "https://boostorg.jfrog.io/artifactory/main/release/1.82.0/boost_1_82_0.zip" `
-          -OutFile "D:\a\RenWeb\RenWeb"
+      run: curl -L https://boostorg.jfrog.io/artifactory/main/release/1.82.0/boost_1_82_0.zip -o C:\boost_1_82_0.zip
+
         
     - name: Unzip boost package
       run: |
-        dir
+        dir "C:\"
         Expand-Archive -Path ".\boost_1_82_0.zip" -DestinationPath ".\boost"
         dir
     
