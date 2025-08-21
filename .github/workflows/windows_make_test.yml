@@ -36,10 +36,9 @@ jobs:
         
     - name: Run boost installer
       run: |
-        tar -xzf C:\boost_1_82_0.tar.gz -C C:\
-        dir "C:\"
+        dir "C:\boost"
         dir "C:\local"
-        dir "C:\local\boost_1_82_0"
+        tar -xzf C:\boost\boost_1_82_0.tar -C C:\boost_real
     
     - name: Try input
       run: |
