@@ -28,7 +28,9 @@ jobs:
       run: |
         $url = "https://netcologne.dl.sourceforge.net/project/boost/boost-binaries/1.82.0/boost_1_82_0-msvc-14.1-64.exe"
         Invoke-WebRequest -Uri $url -OutFile boost.exe
-        7z x boost.exe -oC:\boost
+        # 7z x boost.exe -oC:\boost
+    - name: test
+      run: Get-Item boost.exe | Select-Object Name,Length
 
     - name: Unzip boost package
       run: |
