@@ -35,14 +35,14 @@ jobs:
         mkdir C:\webview2
         tar -xf C:\webview2.nupkg -C C:\webview2
 
-        dir C:\
-        dir C:\webview2
+        dir C:\webview2\build
+        dir C:\webview2\build\native
 
         # Move includes and libs to a predictable place
         # mkdir C:\deps\webview2\include -Force
         # mkdir C:\deps\webview2\lib -Force
-    - name: Set webview headers
 
+    - name: Set webview headers
       run: |
         echo "INCLUDE=C:\webview2\build\native\include;$env:INCLUDE" >> $env:GITHUB_ENV
         echo "LIB=C:\webview2\build\native\*\x64\*.lib;$env:LIB" >> $env:GITHUB_ENV=
