@@ -30,11 +30,11 @@ jobs:
     - name: Install boost
       run: |
         Invoke-WebRequest -Uri "https://boostorg.jfrog.io/artifactory/main/release/1.82.0/boost_1_82_0.zip"
-        dir
     
     - name: Unzip boost package
       run: |
-        Expand-Archive -Path "C:\boost_1_82_0.zip" -DestinationPath ".\boost"
+        dir
+        Expand-Archive -Path ".\boost_1_82_0.zip" -DestinationPath ".\boost"
         dir
     
     - name: Set Boost paths
