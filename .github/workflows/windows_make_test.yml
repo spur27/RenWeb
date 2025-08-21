@@ -29,21 +29,29 @@ jobs:
       with:
         nsis-version: '3.10'
 
-    - name: Get boost installer
+    - name: Get and unzip WebView2
+      run: |
+        curl -L https://www.nuget.org/api/v2/package/Microsoft.Web.WebView2/1.0.3405.78 -o C:\webview2.nupkg
+        tar -xf webview2.nupkg -C C:\
+
+        dirs C:\
+
+        # Move includes and libs to a predictable place
+        # mkdir C:\deps\webview2\include -Force
+        # mkdir C:\deps\webview2\lib -Force
+        # Copy-Item "C:\deps\webview2\build\native\include\*" C:\deps\webview2\include -Recurse -Force
+        # Copy-Item "C:\deps\webview2\build\native\*\x64\*.lib" C:\deps\webview2\lib -Recurse -Force
+
+        # Confirm files exist
+        # dir C:\deps\webview2\include
+        # dir C:\deps\webview2\lib
+
+    - name: Get and unzip boost
       run: |
         curl -L https://github.com/MarkusJx/prebuilt-boost/releases/download/1.82.0/boost-1.82.0-windows-2022-msvc-static-x86.tar.gz -o C:\boost_1_82_0.tar.gz
-        # Get-Content C:\boost_1_82_0.zip -TotalCount 50
-        
-    - name: Run boost installer
-      run: |
         tar -xzf C:\boost_1_82_0.tar.gz -C C:\
-        dir "C:\boost"
-        dir "C:\boost\boost"
-        dir "C:\boost\include"
-        dir "C:\boost\lib"
-        dir "C:\boost\libs"
-    
-    - name: Set Boost paths
+        
+    - name: Set boost headers
       run: |
         dir
         echo "INCLUDE=C:\boost;$env:INCLUDE" >> $env:GITHUB_ENV
