@@ -28,8 +28,9 @@ jobs:
       run: choco install 7zip -y
 
     - name: Install boost
-      run: curl -L https://boostorg.jfrog.io/artifactory/main/release/1.82.0/boost_1_82_0.zip -o C:\boost_1_82_0.zip
-
+      run: |
+        curl -L https://boostorg.jfrog.io/artifactory/main/release/1.82.0/source/boost_1_82_0.zip -o C:\boost_1_82_0.zip
+        Get-Content C:\boost_1_82_0.zip -TotalCount 10
         
     - name: Unzip boost package
       run: |
