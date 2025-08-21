@@ -32,6 +32,7 @@ jobs:
     - name: Get and unzip WebView2
       run: |
         curl -L https://www.nuget.org/api/v2/package/Microsoft.Web.WebView2/1.0.3405.78 -o C:\webview2.nupkg
+        mkdir C:\webview2
         tar -xf C:\webview2.nupkg -C C:\webview2
 
         dir C:\
