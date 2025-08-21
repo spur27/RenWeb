@@ -29,11 +29,9 @@ jobs:
 
     - name: Install boost
       run: |
-        $boostZip = "$env:RUNNER_TEMP\boost_1_82_0.zip"
         Invoke-WebRequest `
           -Uri "https://boostorg.jfrog.io/artifactory/main/release/1.82.0/boost_1_82_0.zip" `
-          -OutFile $boostZip -UseBasicParsing
-        Write-Host "Downloaded to $boostZip"  
+          -OutFile "D:\a\RenWeb\RenWeb"
         
     - name: Unzip boost package
       run: |
