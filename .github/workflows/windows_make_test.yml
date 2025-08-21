@@ -30,6 +30,13 @@ jobs:
     - name: Unzip boost package
       run: |
         Expand-Archive -Path "C:\ProgramData\chocolatey\lib\boost-msvc-14.1\boost-msvc-14.1.nupkg" ` -DestinationPath "C:\ProgramData\chocolatey\lib\boost-msvc-14.1\unpacked"
+    
+    - name: Locate Boost install
+      run: |
+        echo "Searching for boost headers..."
+        Get-ChildItem -Path C:\ -Recurse -Force -ErrorAction SilentlyContinue `
+          -Include boost\*.hpp |
+          Select-Object -First 20 FullName
 
     - name: Set Boost paths
       run: |
