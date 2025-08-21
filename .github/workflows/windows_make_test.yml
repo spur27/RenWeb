@@ -33,8 +33,8 @@ jobs:
 
     - name: Set Boost paths
       run: |
-        dir C:\ProgramData\chocolatey\lib\boost-msvc-14.1
-        dir C:\ProgramData\chocolatey\lib\boost-msvc-14.1\unpacked
+        dir C:\ProgramData\chocolatey\lib\boost-msvc-14.1\tools
+        dir C:\ProgramData\chocolatey\lib\boost-msvc-14.1\unpacked\tools
         echo "INCLUDE=C:\ProgramData\chocolatey\lib\boost-msvc-14.1\unpacked\tools\boost\include;$env:INCLUDE" >> $env:GITHUB_ENV
         echo "LIB=C:\ProgramData\chocolatey\lib\boost-msvc-14.1\unpacked\tools\boost\lib;$env:LIB" >> $env:GITHUB_ENV
         echo $INCLUDE
