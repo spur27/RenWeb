@@ -33,9 +33,12 @@ jobs:
 
     - name: Set Boost paths
       run: |
+        dir C:\ProgramData\chocolatey\lib\boost-msvc-14.1
         dir C:\ProgramData\chocolatey\lib\boost-msvc-14.1\unpacked
-        echo "INCLUDE=C:\ProgramData\chocolatey\lib\boost-msvc-14.1\unpacked\tools\boost\include;%INCLUDE%" >> $env:GITHUB_ENV
-        echo "LIB=C:\ProgramData\chocolatey\lib\boost-msvc-14.1\unpacked\lib;%LIB%" >> $env:GITHUB_ENV
+        echo "INCLUDE=C:\ProgramData\chocolatey\lib\boost-msvc-14.1\unpacked\tools\boost\include;$env:INCLUDE" >> $env:GITHUB_ENV
+        echo "LIB=C:\ProgramData\chocolatey\lib\boost-msvc-14.1\unpacked\tools\boost\lib;$env:LIB" >> $env:GITHUB_ENV
+        echo $INCLUDE
+        echo $LIB
 
     - name: npm install UI packages
       run: npm i
@@ -51,6 +54,6 @@ jobs:
       run: |
         git --version
         ls
-        bash -c "make"
+        make
       working-directory: ./engine
       shell: bash
