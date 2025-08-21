@@ -30,11 +30,11 @@ jobs:
     - name: Install boost
       run: |
         curl -L https://sourceforge.net/projects/boost/files/boost-binaries/1.82.0/boost_1_82_0-msvc-14.1-64.exe/download -o C:\boost_1_82_0.zip
-        Get-Content C:\boost_1_82_0.zip -TotalCount 50
+        # Get-Content C:\boost_1_82_0.zip -TotalCount 50
         
     - name: Unzip boost package
       run: |
-        Expand-Archive -Path ".\boost_1_82_0.zip" -DestinationPath "C:\boost"
+        Expand-Archive -Path "C:\boost_1_82_0.zip" -DestinationPath "C:\boost"
         dir "C:\"
         dir "C:\boost"
     
