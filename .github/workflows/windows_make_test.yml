@@ -24,11 +24,18 @@ jobs:
       with:
         arch: x64
 
+    - name: Install 7zip
+      run: choco install 7zip -y
+
     - name: Install boost
-      run: Invoke-WebRequest -Uri "https://boostorg.jfrog.io/artifactory/main/release/1.82.0/boost_1_82_0.zip" -OutFile "C:\boost_1_82_0.zip"
+      run: |
+        Invoke-WebRequest -Uri "https://boostorg.jfrog.io/artifactory/main/release/1.82.0/boost_1_82_0.zip"
+        dir
     
     - name: Unzip boost package
-      run: Expand-Archive -Path "C:\boost_1_82_0.zip" -DestinationPath "C:\boost"
+      run: |
+        Expand-Archive -Path "C:\boost_1_82_0.zip" -DestinationPath ".\boost"
+        dir
     
     - name: Set Boost paths
       run: |
