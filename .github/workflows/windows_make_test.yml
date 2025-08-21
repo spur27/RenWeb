@@ -25,26 +25,14 @@ jobs:
         arch: x64
 
     - name: Install boost
-      run: choco install boost-msvc-14.1
-
-    - name: Unzip boost package
-      run: |
-        Expand-Archive -Path "C:\ProgramData\chocolatey\lib\boost-msvc-14.1\boost-msvc-14.1.nupkg" ` -DestinationPath "C:\ProgramData\chocolatey\lib\boost-msvc-14.1\unpacked"
+      run: Invoke-WebRequest -Uri "https://boostorg.jfrog.io/artifactory/main/release/1.82.0/boost_1_82_0.zip" -OutFile "C:\boost_1_82_0.zip"
     
-    - name: Locate Boost install
-      run: |
-        echo "Searching for boost headers..."
-        Get-ChildItem -Path C:\ -Recurse -Force -ErrorAction SilentlyContinue `
-          -Include boost\*.hpp |
-          Select-Object -First 20 FullName
-
+    - name: Unzip boost package
+      run: Expand-Archive -Path "C:\boost_1_82_0.zip" -DestinationPath "C:\boost"
+    
     - name: Set Boost paths
       run: |
-        dir C:\Users\runneradmin\
-        dir C:\Users\runneradmin\.nuget\
-        dir C:\Users\runneradmin\.nuget\packages\
-        dir C:\Users\runneradmin\.nuget\packages\boost\1.82.0\build\native\include
-        dir C:\Users\runneradmin\.nuget\packages\boost\1.82.0\build\native\lib\x64
+        dir
         echo "INCLUDE=C:\ProgramData\chocolatey\lib\boost-msvc-14.1\unpacked\tools\boost\include;$env:INCLUDE" >> $env:GITHUB_ENV
         echo "LIB=C:\ProgramData\chocolatey\lib\boost-msvc-14.1\unpacked\tools\boost\lib;$env:LIB" >> $env:GITHUB_ENV
         echo $INCLUDE
