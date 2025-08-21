@@ -33,6 +33,10 @@ jobs:
 
     - name: Set Boost paths
       run: |
+        dir C:\
+        dir C:\ProgramData\
+        dir C:\ProgramData\chocolatey\
+        dir C:\ProgramData\chocolatey\lib\
         dir C:\ProgramData\chocolatey\lib\boost-msvc-14.1
         dir C:\ProgramData\chocolatey\lib\boost-msvc-14.1\tools
         dir C:\ProgramData\chocolatey\lib\boost-msvc-14.1\unpacked
