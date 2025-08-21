@@ -24,25 +24,30 @@ jobs:
       with:
         arch: x64
 
-    - name: Install 7zip
-      run: choco install 7zip -y
-
-    - name: Install boost
+    - name: Download boost
       run: |
         curl -L https://archives.boost.io/release/1.82.0/source/boost_1_82_0.zip -o C:\boost_1_82_0.zip
         
-    - name: Unzip boost package
+    - name: Unzip boost
       run: |
-        dir "C:\"
         Expand-Archive -Path "C:\boost_1_82_0.zip" -DestinationPath "C:\boost"
         dir "C:\"
         dir "C:\boost"
-    
+        dir "C:\boost\boost_1_82_0"
+
+    - name: Compile boost
+      run: |
+        cd C:\boost\boost_1_82_0
+        .\bootstrap.bat
+        .\b2.exe toolset=msvc-14.1 address-model=64 link=static runtime-link=static threading=multi variant=debug stage  
+        dir "C:\boost\boost_1_82_0\stage"
+        dir "C:\boost\boost_1_82_0\stage\lib"
+  
     - name: Set Boost paths
       run: |
         dir
-        echo "INCLUDE=C:\ProgramData\chocolatey\lib\boost-msvc-14.1\unpacked\tools\boost\include;$env:INCLUDE" >> $env:GITHUB_ENV
-        echo "LIB=C:\ProgramData\chocolatey\lib\boost-msvc-14.1\unpacked\tools\boost\lib;$env:LIB" >> $env:GITHUB_ENV
+        echo "INCLUDE=C:\boost\boost_1_82_0;$env:INCLUDE" >> $env:GITHUB_ENV
+        echo "LIB=C:\boost\boost_1_82_0\stage\lib;$env:LIB" >> $env:GITHUB_ENV
         echo $INCLUDE
         echo $LIB
 
