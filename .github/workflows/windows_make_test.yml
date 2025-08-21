@@ -24,15 +24,14 @@ jobs:
       with:
         arch: x64
 
-    - name: Install boost
+    - name: Get boost installer
       run: |
-        curl -L https://sourceforge.net/projects/boost/files/boost-binaries/1.82.0/boost_1_82_0-msvc-14.1-64.exe/download -o C:\boost_1_82_0.zip
+        curl -L https://sourceforge.net/projects/boost/files/boost-binaries/1.82.0/boost_1_82_0-msvc-14.1-64.exe/download -o C:\boost_1_82_0.exe
         # Get-Content C:\boost_1_82_0.zip -TotalCount 50
         
-    - name: Unzip boost package
+    - name: Run boost installer
       run: |
-        dir "C:\"
-        Expand-Archive -Path "C:\boost_1_82_0.zip" -DestinationPath "C:\boost"
+        C:\boost_1_82_0.exe /S
         dir "C:\"
         dir "C:\boost"
     
