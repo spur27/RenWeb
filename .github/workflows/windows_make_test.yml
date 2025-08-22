@@ -56,7 +56,8 @@ jobs:
 
     - name: Set Lib
       run: |
-        echo "LIBPATH=C:\webview2\build\native\*\x64\*.lib;C:\boost\lib;${env:LIBPATH}" >> $env:GITHUB_ENV
+        # C:\webview2\build\native\*\x64\*.lib
+        echo "LIBPATH=C:\boost\lib;${env:LIBPATH}" >> $env:GITHUB_ENV
         dir C:\boost\lib
 
     - name: View vars
