@@ -37,7 +37,7 @@ ifeq ($(TARGET),debug)
 	CXXFLAGS += /EHsc /Zi /Od /W3
 else
 	CXXFLAGS += /EHsc /O2
-ifneq ($(LINK),shared)
+ifneq ($(LINKTYPE),shared)
 	CXXFLAGS += /MT 
 endif
 endif
@@ -137,7 +137,7 @@ $(BUILD_PATH)/$(EXE): $(OBJS) | $(BUILD_PATH)
 	$(call step,Linking Executable,$@)
 ifeq ($(OS_NAME),Windows)
 	npm run script:gen_resource
-ifeq ($(LINK),shared)
+ifeq ($(LINKTYPE),shared)
 	$(CXX) $(OBJS) ./src/.build/app.res $(CXXFLAGS) /link C:\boost\lib\boost_filesystem-vc143-mt-x64-1_82.lib C:\boost\lib\boost_url-vc143-mt-x64-1_82.lib C:\boost\lib\boost_thread-vc143-mt-x64-1_82.lib C:\boost\lib\boost_system-vc143-mt-x64-1_82.lib  C:\boost\lib\boost_program_options-vc143-mt-x64-1_82.lib C:\boost\lib\boost_chrono-vc143-mt-x64-1_82.lib /SUBSYSTEM:WINDOWS /OUT:$@
 else
 	$(CXX) $(OBJS) ./src/.build/app.res $(CXXFLAGS) /SUBSYSTEM:WINDOWS /OUT:$@
@@ -152,7 +152,7 @@ endif
 $(OBJ_PATH)/%$(OBJ_EXT): $(SRC_PATH)/%.cpp | $(OBJ_PATH)
 	$(call step,Compiling,$<)
 ifeq ($(OS_NAME),Windows)
-ifeq ($(LINK),shared)
+ifeq ($(LINKTYPE),shared)
 	$(CXX) $(CXXFLAGS) /I$(INC_PATH) /MD /DBOOST_ALL_DYN_LINK $(EXTERN_INC_PATHS) /c $< /Fo$@
 else
 	$(CXX) $(CXXFLAGS) /I$(INC_PATH) $(EXTERN_INC_PATHS) /c $< /Fo$@
