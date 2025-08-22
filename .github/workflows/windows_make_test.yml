@@ -35,23 +35,16 @@ jobs:
         mkdir C:\webview2
         tar -xf C:\webview2.nupkg -C C:\webview2
       
-    - name: Set webview headers
-      run: |
-        echo "INCLUDE=C:\webview2\build\native\include;$env:INCLUDE" >> $env:GITHUB_ENV
-        echo "LIB=C:\webview2\build\native\*\x64\*.lib;$env:LIB" >> $env:GITHUB_ENV
-
     - name: Get and unzip boost
       run: |
         curl -L https://github.com/MarkusJx/prebuilt-boost/releases/download/1.82.0/boost-1.82.0-windows-2022-msvc-static-x86.tar.gz -o C:\boost_1_82_0.tar.gz
         tar -xzf C:\boost_1_82_0.tar.gz -C C:\
         
-    - name: Set boost headers
+    - name: Set headers
       run: |
-        dir
-        echo "INCLUDE=C:\boost;$env:INCLUDE" >> $env:GITHUB_ENV
-        echo "LIB=C:\boost\lib;$env:LIB" >> $env:GITHUB_ENV
+        echo "INCLUDE=C:\webview2\build\native\include;C:\boost;$env:INCLUDE" >> $env:GITHUB_ENV
+        echo "LIB=C:\webview2\build\native\*\x64\*.lib;C:\boost\lib;$env:LIB" >> $env:GITHUB_ENV
         echo "LIB = $env:LIB"
-        dir C:\boost\lib
 
     - name: npm install UI packages
       run: npm i
