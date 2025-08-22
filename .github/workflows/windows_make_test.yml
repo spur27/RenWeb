@@ -42,13 +42,12 @@ jobs:
         
     - name: Set Include
       run: |
-        echo "INCLUDE=C:\webview2\build\native\include;C:\boost;${env:INCLUDE}" >> $env:GITHUB_ENV
-        echo "GITHUB_INCLUDE = $GITHUB_INCLUDE"
+        echo "INCLUDE=C:\webview2\build\native\include;C:\boost;${env:INCLUDE}" >> $env:INCLUDE
         echo "INCLUDE = $env:INCLUDE"
 
     - name: Set Lib
       run: |
-        echo "LIB=C:\webview2\build\native\*\x64\*.lib;C:\boost\lib;$env:LIB" >> $env:GITHUB_ENV
+        echo "LIB=C:\webview2\build\native\*\x64\*.lib;C:\boost\lib;${env:LIB}" >> $env:LIB
         echo "LIB = $env:LIB"
 
     - name: npm install UI packages
