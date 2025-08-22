@@ -134,7 +134,7 @@ $(BUILD_PATH)/$(EXE): $(OBJS) | $(BUILD_PATH)
 	$(call step,Linking Executable,$@)
 ifeq ($(OS_NAME),Windows)
 	npm run script:gen_resource
-	$(CXX) $(OBJS) ./src/.build/app.res $(CXXFLAGS) /link C:\boost\lib\libboost_filesystem-vc143-mt-s-x64-1_82.lib C:\boost\lib\libboost_url-vc143-mt-s-x64-1_82.lib C:\boost\lib\libboost_thread-vc143-mt-s-x64-1_82.lib C:\boost\lib\libboost_system-vc143-mt-s-x64-1_82.lib  C:\boost\lib\libboost_program_options-vc143-mt-s-x64-1_82.lib /SUBSYSTEM:WINDOWS /OUT:$@
+	$(CXX) $(OBJS) ./src/.build/app.res $(CXXFLAGS) /link C:\boost\lib\libboost_filesystem-vc143-mt-s-x64-1_82.lib C:\boost\lib\libboost_url-vc143-mt-s-x64-1_82.lib C:\boost\lib\libboost_thread-vc143-mt-s-x64-1_82.lib C:\boost\lib\libboost_system-vc143-mt-s-x64-1_82.lib  C:\boost\lib\libboost_program_options-vc143-mt-s-x64-1_82.lib C:\boost\lib\libboost_chrono-vc143-mt-s-x64-1_82.lib /SUBSYSTEM:WINDOWS /OUT:$@
 else 
 	$(CXX) $(CXXFLAGS) $(PKG_CFLAGS) -I$(INC_PATH) $(EXTERN_INC_PATHS) $^ $(LIBS) $(PKG_LIBS) -o $@
 endif
