@@ -139,7 +139,7 @@ ifeq ($(OS_NAME),Windows)
 	npm run script:gen_resource
 ifeq ($(LINKTYPE),shared)
 	$(call describe,Linking for shared)
-	$(CXX) $(OBJS) ./src/.build/app.res $(CXXFLAGS) /link C:\boost\lib\boost_filesystem-vc143-mt-x64-1_82.lib C:\boost\lib\boost_url-vc143-mt-x64-1_82.lib C:\boost\lib\boost_thread-vc143-mt-x64-1_82.lib C:\boost\lib\boost_system-vc143-mt-x64-1_82.lib  C:\boost\lib\boost_program_options-vc143-mt-x64-1_82.lib C:\boost\lib\boost_chrono-vc143-mt-x64-1_82.lib /SUBSYSTEM:WINDOWS /OUT:$@
+	$(CXX) $(OBJS) ./src/.build/app.res $(CXXFLAGS) /link /SUBSYSTEM:WINDOWS /OUT:$@
 else
 	$(CXX) $(OBJS) ./src/.build/app.res $(CXXFLAGS) /SUBSYSTEM:WINDOWS /OUT:$@
 endif
