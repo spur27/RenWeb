@@ -33,11 +33,14 @@ ifeq ($(OS),Windows_NT)
 	OBJ_EXT := .obj
 	CXX := $(CROSS_COMPILE)cl
 	CXXFLAGS := /std:c++17 /utf-8 /bigobj
-	ifeq ($(TARGET),debug)
-		CXXFLAGS += /EHsc /Zi /Od /W3
-	else
-		CXXFLAGS += /EHsc /O2 /MT
-	endif
+ifeq ($(TARGET),debug)
+	CXXFLAGS += /EHsc /Zi /Od /W3
+else
+	CXXFLAGS += /EHsc /O2
+ifneq ($(LINK),shared)
+	CXXFLAGS += /MT 
+endif
+endif
 else
 	SHELL := /bin/bash
     UNAME_S := $(shell uname -s)
@@ -150,7 +153,7 @@ $(OBJ_PATH)/%$(OBJ_EXT): $(SRC_PATH)/%.cpp | $(OBJ_PATH)
 	$(call step,Compiling,$<)
 ifeq ($(OS_NAME),Windows)
 ifeq ($(LINK),shared)
-	$(CXX) $(CXXFLAGS) /I$(INC_PATH) /DBOOST_ALL_DYN_LINK $(EXTERN_INC_PATHS) /c $< /Fo$@
+	$(CXX) $(CXXFLAGS) /I$(INC_PATH) /MD /DBOOST_ALL_DYN_LINK $(EXTERN_INC_PATHS) /c $< /Fo$@
 else
 	$(CXX) $(CXXFLAGS) /I$(INC_PATH) $(EXTERN_INC_PATHS) /c $< /Fo$@
 endif
