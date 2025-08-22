@@ -37,7 +37,7 @@ jobs:
       
     - name: Get and unzip boost
       run: |
-        curl -L https://github.com/MarkusJx/prebuilt-boost/releases/download/1.82.0/boost-1.82.0-windows-2022-msvc-static-x86.tar.gz -o C:\boost_1_82_0.tar.gz
+        curl -L https://github.com/MarkusJx/prebuilt-boost/releases/download/1.82.0/boost-1.82.0-windows-2019-msvc-static-x86.tar.gz -o C:\boost_1_82_0.tar.gz
         tar -xzf C:\boost_1_82_0.tar.gz -C C:\
         
     - name: Set Include
