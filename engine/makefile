@@ -61,6 +61,7 @@ else
         $(error Unknown operating system detected. Don't know how to proceed :/)
     endif
 endif
+LINKTYPE := static
 # -----------------------------------------------------------------------------
 # Utility stuff for the makefile
 # -----------------------------------------------------------------------------
@@ -72,21 +73,22 @@ endif
 # 	@printf "%s %s\n" "$(1)" "$(2)"
 # endef
 # else
-RESET  := \033[0m
-RED    := \033[31m
-GREEN  := \033[32m
-YELLOW := \033[33m
-BLUE   := \033[34m
-CYAN   := \033[36m
-BOLD   := \033[1m
+RESET   := \033[0m
+RED     := \033[31m
+GREEN   := \033[32m
+YELLOW  := \033[33m
+BLUE    := \033[34m
+MAGENTA := \033[35m
+CYAN    := \033[36m
+BOLD    := \033[1m
 define describe
-	@printf "$(BLUE)%s$(RESET) %s\n" "$(1)" "$(2)"
+	@printf "$(GREEN)$(BOLD)%s$(RESET) $(MAGENTA)%s$(RESET) $(GREEN)$(BOLD)%s$(RESET) $(MAGENTA)%s$(RESET)\n" "$(1)" "$(2)" "$(3)" "$(4)"
 endef
 define warn
-	@printf "$(YELLOW)$(BOLD)%s$(RESET) %s\n" "$(1)" "$(2)"
+	@printf "$(YELLOW)$(BOLD)%s$(RESET) $(MAGENTA)%s$(RESET) $(YELLOW)$(BOLD)%s$(RESET) $(MAGENTA)%s$(RESET)\n" "$(1)" "$(2)" "$(3)" "$(4)"
 endef
 define step
-	@printf "$(CYAN)$(BOLD)%s$(RESET) %s\n" "$(1)" "$(2)"
+	@printf "$(CYAN)$(BOLD)%s$(RESET) $(MAGENTA)%s$(RESET) $(CYAN)$(BOLD)%s$(RESET) $(MAGENTA)%s$(RESET)\n" "$(1)" "$(2)" "$(3)" "$(4)"
 endef
 # endif
 # -----------------------------------------------------------------------------
@@ -107,6 +109,9 @@ RC_PATH :=    ./src/.build/app.res
 # -----------------------------------------------------------------------------
 # Static Linked Libraries
 # -----------------------------------------------------------------------------
+ifeq ($(OS_NAME), Windows)
+	LIBS :=  
+endif
 ifeq ($(OS_NAME), Apple)
 	LIBS := -ldl 
 endif
@@ -134,12 +139,11 @@ all: $(BUILD_PATH)/$(EXE)
 # RULE: Link all object files into executable
 # -----------------------------------------------------------------------------
 $(BUILD_PATH)/$(EXE): $(OBJS) | $(BUILD_PATH)
-	$(call step,Linking Executable,$@)
+	$(call step,Linking Executable,$@,for,$(LINKTYPE))
 ifeq ($(OS_NAME),Windows)
 	npm run script:gen_resource
 ifeq ($(LINKTYPE),shared)
-	$(call describe,Linking for shared)
-	$(CXX) $(OBJS) ./src/.build/app.res $(CXXFLAGS) /link /SUBSYSTEM:WINDOWS /OUT:$@
+	$(CXX) $(OBJS) ./src/.build/app.res $(CXXFLAGS) /link $(LIBS) /SUBSYSTEM:WINDOWS /OUT:$@
 else
 	$(CXX) $(OBJS) ./src/.build/app.res $(CXXFLAGS) /SUBSYSTEM:WINDOWS /OUT:$@
 endif
@@ -159,7 +163,6 @@ $(OBJ_PATH)/%$(OBJ_EXT): $(SRC_PATH)/%.cpp | $(OBJ_PATH)
 	$(call step,Compiling,$<)
 ifeq ($(OS_NAME),Windows)
 ifeq ($(LINKTYPE),shared)
-	$(call describe,Compiling for shared)
 	$(CXX) $(CXXFLAGS) /I$(INC_PATH) /MD /DBOOST_ALL_DYN_LINK $(EXTERN_INC_PATHS) /c $< /Fo$@
 else
 	$(CXX) $(CXXFLAGS) /I$(INC_PATH) $(EXTERN_INC_PATHS) /c $< /Fo$@
