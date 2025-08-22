@@ -52,5 +52,10 @@ jobs:
             boost-url
 
     - name: make
-      run: make run
+      run: make
       working-directory: ./engine
+
+    - name: Generate installers
+      run: echo "Installers can't be generated for rpm yet!!"
+      # run: npm run script:installers
+

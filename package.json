@@ -1,7 +1,7 @@
 {
   "scripts": {
     "script:build": "cd ./scripts && npm run build",
-    "script:installer": "cd ./scripts && npm run installer",
+    "script:installers": "cd ./scripts && npm run installers",
     "script:getname": "cd ./scripts && npm run getname",
     "script:gen_resource": "cd ./scripts && npm run gen_resource",
     "make": "cd ./engine && make",

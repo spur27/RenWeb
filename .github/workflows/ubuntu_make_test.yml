@@ -39,5 +39,8 @@ jobs:
             libboost-all-dev
 
     - name: make
-      run: make run
+      run: make
       working-directory: ./engine
+
+    - name: Generate installers
+      run: npm run script:installers

@@ -139,7 +139,7 @@ all: $(BUILD_PATH)/$(EXE)
 # RULE: Link all object files into executable
 # -----------------------------------------------------------------------------
 $(BUILD_PATH)/$(EXE): $(OBJS) | $(BUILD_PATH)
-	$(call step,Linking Executable,$@,for,$(LINKTYPE))
+	$(call step,Linking Executable,$@,of link type,$(LINKTYPE))
 ifeq ($(OS_NAME),Windows)
 	npm run script:gen_resource
 ifeq ($(LINKTYPE),shared)

@@ -1,7 +1,7 @@
 {
   "scripts": {
     "build": "npx tsx ./src/build.ts",
-    "installer": "npx tsx ./src/installer.ts",
+    "installers": "npx tsx ./src/installers.ts",
     "getname": "npx tsx ./src/getname.ts",
     "gen_resource": "npx tsx ./src/gen_resource.ts"
   },
