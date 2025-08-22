@@ -42,7 +42,8 @@ jobs:
         
     - name: Set Include
       run: |
-        echo "INCLUDE=C:\webview2\build\native\include;C:\boost;${env:INCLUDE}" >> $env:INCLUDE
+        echo "INCLUDE=C:\webview2\build\native\include;C:\boost;${env:INCLUDE}" >> $env:GITHUB_ENV
+        echo "GITHUB_ENV = $env:GITHUB_ENV"
         echo "INCLUDE = $env:INCLUDE"
 
     - name: Set Lib
