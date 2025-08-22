@@ -37,17 +37,17 @@ jobs:
       
     - name: Get and unzip boost
       run: |
-        curl -L https://github.com/MarkusJx/prebuilt-boost/releases/download/1.82.0/boost-1.82.0-windows-2022-msvc-static-x86.tar.gz -o C:\boost_1_82_0.tar.gz
+        curl -L https://github.com/MarkusJx/prebuilt-boost/releases/download/1.82.0/boost-1.82.0-windows-2022-msvc-shared-x86.tar.gz -o C:\boost_1_82_0.tar.gz
         tar -xzf C:\boost_1_82_0.tar.gz -C C:\
-        cd C:\boost\lib
-        Get-ChildItem -Filter "libboost_*-vc*.lib" | ForEach-Object {
-            $oldName = $_.Name
-            $newName = $oldName -replace '(-mt)(-x64)', '$1-s$2'
-            if ($oldName -ne $newName) {
-                Rename-Item $oldName $newName
-                Write-Host "Renamed $oldName -> $newName"
-            }
-        }
+        # cd C:\boost\lib
+        # Get-ChildItem -Filter "libboost_*-vc*.lib" | ForEach-Object {
+        #     $oldName = $_.Name
+        #     $newName = $oldName -replace '(-mt)(-x64)', '$1-s$2'
+        #     if ($oldName -ne $newName) {
+        #         Rename-Item $oldName $newName
+        #         Write-Host "Renamed $oldName -> $newName"
+        #     }
+        # }
 
         
     - name: Set Include
