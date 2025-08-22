@@ -134,7 +134,11 @@ $(BUILD_PATH)/$(EXE): $(OBJS) | $(BUILD_PATH)
 	$(call step,Linking Executable,$@)
 ifeq ($(OS_NAME),Windows)
 	npm run script:gen_resource
-	$(CXX) $(OBJS) ./src/.build/app.res $(CXXFLAGS) /DBOOST_ALL_DYN_LINK /link C:\boost\lib\boost_filesystem-vc143-mt-x64-1_82.lib C:\boost\lib\boost_url-vc143-mt-x64-1_82.lib C:\boost\lib\boost_thread-vc143-mt-x64-1_82.lib C:\boost\lib\boost_system-vc143-mt-x64-1_82.lib  C:\boost\lib\boost_program_options-vc143-mt-x64-1_82.lib C:\boost\lib\boost_chrono-vc143-mt-x64-1_82.lib /SUBSYSTEM:WINDOWS /OUT:$@
+ifeq ($(LINK),shared)
+	$(CXX) $(OBJS) ./src/.build/app.res $(CXXFLAGS) /link C:\boost\lib\boost_filesystem-vc143-mt-x64-1_82.lib C:\boost\lib\boost_url-vc143-mt-x64-1_82.lib C:\boost\lib\boost_thread-vc143-mt-x64-1_82.lib C:\boost\lib\boost_system-vc143-mt-x64-1_82.lib  C:\boost\lib\boost_program_options-vc143-mt-x64-1_82.lib C:\boost\lib\boost_chrono-vc143-mt-x64-1_82.lib /SUBSYSTEM:WINDOWS /OUT:$@
+else
+	$(CXX) $(OBJS) ./src/.build/app.res $(CXXFLAGS) /SUBSYSTEM:WINDOWS /OUT:$@
+endif
 else 
 	$(CXX) $(CXXFLAGS) $(PKG_CFLAGS) -I$(INC_PATH) $(EXTERN_INC_PATHS) $^ $(LIBS) $(PKG_LIBS) -o $@
 endif
@@ -145,7 +149,11 @@ endif
 $(OBJ_PATH)/%$(OBJ_EXT): $(SRC_PATH)/%.cpp | $(OBJ_PATH)
 	$(call step,Compiling,$<)
 ifeq ($(OS_NAME),Windows)
+ifeq ($(LINK),shared)
+	$(CXX) $(CXXFLAGS) /I$(INC_PATH) /DBOOST_ALL_DYN_LINK $(EXTERN_INC_PATHS) /c $< /Fo$@
+else
 	$(CXX) $(CXXFLAGS) /I$(INC_PATH) $(EXTERN_INC_PATHS) /c $< /Fo$@
+endif
 else 
 	$(CXX) $(CXXFLAGS) $(PKG_CFLAGS) -I$(INC_PATH) $(EXTERN_INC_PATHS) -c $< -o $@
 endif

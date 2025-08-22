@@ -79,6 +79,6 @@ jobs:
       run: |
         git --version
         ls
-        make
+        make LINK=shared
       working-directory: ./engine
       shell: bash
