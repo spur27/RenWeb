@@ -144,7 +144,12 @@ else
 	$(CXX) $(OBJS) ./src/.build/app.res $(CXXFLAGS) /SUBSYSTEM:WINDOWS /OUT:$@
 endif
 else 
+ifeq ($(LINKTYPE),shared)
+	$(call warn,Shared for unix isn't implemented yet! Using static)
 	$(CXX) $(CXXFLAGS) $(PKG_CFLAGS) -I$(INC_PATH) $(EXTERN_INC_PATHS) $^ $(LIBS) $(PKG_LIBS) -o $@
+else
+	$(CXX) $(CXXFLAGS) $(PKG_CFLAGS) -I$(INC_PATH) $(EXTERN_INC_PATHS) $^ $(LIBS) $(PKG_LIBS) -o $@
+endif
 endif
 	$(call step,Linking Executable [DONE],$@)
 # -----------------------------------------------------------------------------
@@ -160,7 +165,12 @@ else
 	$(CXX) $(CXXFLAGS) /I$(INC_PATH) $(EXTERN_INC_PATHS) /c $< /Fo$@
 endif
 else 
+ifeq ($(LINKTYPE),shared)
+	$(call warn,Shared for unix isn't implemented yet! Using static)
 	$(CXX) $(CXXFLAGS) $(PKG_CFLAGS) -I$(INC_PATH) $(EXTERN_INC_PATHS) -c $< -o $@
+else
+	$(CXX) $(CXXFLAGS) $(PKG_CFLAGS) -I$(INC_PATH) $(EXTERN_INC_PATHS) -c $< -o $@
+endif
 endif
 	$(call step,Compiling [DONE],$<)
 # -----------------------------------------------------------------------------
