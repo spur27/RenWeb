@@ -79,6 +79,6 @@ jobs:
       run: |
         git --version
         ls
-        make LINKTYPE=shared
+        make LINKTYPE=shared LIBS="C:\boost\lib\boost_filesystem-vc143-mt-x64-1_82.lib C:\boost\lib\boost_url-vc143-mt-x64-1_82.lib C:\boost\lib\boost_thread-vc143-mt-x64-1_82.lib C:\boost\lib\boost_system-vc143-mt-x64-1_82.lib  C:\boost\lib\boost_program_options-vc143-mt-x64-1_82.lib C:\boost\lib\boost_chrono-vc143-mt-x64-1_82.lib"
       working-directory: ./engine
       shell: bash
