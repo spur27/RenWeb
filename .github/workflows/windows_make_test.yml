@@ -49,7 +49,7 @@ jobs:
       run: |
         dir
         echo "INCLUDE=C:\boost;$env:INCLUDE" >> $env:GITHUB_ENV
-        echo "LIB=C:\boost\lib\;$env:LIB" >> $env:GITHUB_ENV
+        echo "LIB=C:\boost\lib;$env:LIB" >> $env:GITHUB_ENV
         echo "LIB = $env:LIB"
         dir C:\boost\lib
 
