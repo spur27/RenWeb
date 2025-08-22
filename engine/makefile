@@ -80,7 +80,7 @@ BLUE   := \033[34m
 CYAN   := \033[36m
 BOLD   := \033[1m
 define describe
-	@printf "$(GREEN)$(BOLD)%s$(RESET) %s\n" "$(1)" "$(2)"
+	@printf "$(BLUE)%s$(RESET) %s\n" "$(1)" "$(2)"
 endef
 define warn
 	@printf "$(YELLOW)$(BOLD)%s$(RESET) %s\n" "$(1)" "$(2)"
