@@ -23,8 +23,8 @@ jobs:
       run: npm i
       working-directory: ./scripts
 
-    - name: compile source libs
-      run: npm run compile:ts
+    - name: Build pages
+      run: npm run script:build
 
     - name: install dependencies
       run: |

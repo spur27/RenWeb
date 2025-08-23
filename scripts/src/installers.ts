@@ -248,7 +248,7 @@ try {
             windows();
             break;
         default:
-            logger.critical(`unknown OS type: ${os_type}`);
+            throw new Error(`unknown OS type: ${os_type}`);
             break;
     }
 } catch (e) {
