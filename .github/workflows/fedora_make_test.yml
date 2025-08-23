@@ -56,6 +56,5 @@ jobs:
       working-directory: ./engine
 
     - name: Generate installers
-      run: echo "Installers can't be generated for rpm yet!!"
-      # run: npm run script:installers
+      run: npm run script:installers skip
 

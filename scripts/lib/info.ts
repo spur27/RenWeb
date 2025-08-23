@@ -3,6 +3,7 @@ import { readFileSync } from 'fs';
 import Path from 'path';
 import { LogLevel, Logger } from './logger.ts';
 import Chalk from 'chalk';
+import { execSync } from 'child_process';
 
 
 export type Info = {
@@ -82,4 +83,19 @@ export function getInfo(): Info {
     info.simple_name = info.name.trim().replaceAll(/\s/g, "-").toLowerCase();
     info.name_no_whitespace = info.name.trim().replaceAll(/\s/g, "");
     return info;
+}
+
+//
+export function getLinuxPMType(): string {
+    try {
+        if (execSync("dpkg --version")) {
+            return 'deb';
+        }
+    } catch (e) { }
+    try {
+        if (execSync("rpm --version")) {
+            return 'rpm';
+        }
+    } catch (e) { }
+    return "";
 }

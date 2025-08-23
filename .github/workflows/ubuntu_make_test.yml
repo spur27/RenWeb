@@ -43,4 +43,4 @@ jobs:
       working-directory: ./engine
 
     - name: Generate installers
-      run: npm run script:installers
+      run: npm run script:installers skip
