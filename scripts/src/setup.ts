@@ -120,11 +120,57 @@ const deb = () => {
     if (!no_missing_submodule_flag) {
         throwCriticalError("Required submodules not found. Make sure you clone the repo with '--recurse-submodules' as a flag!");
     }
-    
     logger.info(`Checking for debian... [DONE]`);
 }
 
-
+const rpm = () => {
+    logger.info(`Checking for rpm...`);
+    header(`Essentials`);
+    let essentials_tool_flag = true;
+    let exists = (tool: string, bad_callback=bad, bad_msg="not found.", req=true) => {
+        try { execSync(`command -v ${tool}`, {stdio: "ignore"}); good(tool); } 
+        catch (e) { let res = bad_callback(tool, bad_msg); if (!essentials_tool_flag) essentials_tool_flag = res; }
+    }
+    exists('g++', warn, "change CXX in ./engine/makefile if you're using a different compiler.");
+    exists('make');
+    exists('git', warn, "make sure you install required submodules to ./engine/external if you haven't already.");
+    exists('rpm');
+    exists('nvm', warn, "not found. [optional]");
+    exists('bear', warn, "useful for generating ./engine/compile_commands.json [optional]");
+    if (!essentials_tool_flag) {
+        throwCriticalError(`Cannot progress until all essentials are installed and usable`);
+    }
+    header(`Libs`);
+    let missing_packages = '';
+    exists = (pkg: string, bad_callback=bad, bad_msg="is missing.", req=true) => {
+        try { execSync(`rpm -q ${pkg}`, {stdio: "ignore"}); good(pkg, "is installed."); } 
+        catch (e) { bad_callback(pkg, bad_msg); if(req) missing_packages += `${pkg} `}
+    }
+    exists('gtk3-devel');
+    exists('webkit2gtk4.1-devel');
+    exists('gtk3', warn, "is missing and is used when compiling for release if available. [not required]", false);
+    exists('webkit2gtk4.1', warn, "is missing and is used when compiling for release if available. [not required]", false);
+    exists('pkgconf-pkg-config');
+    exists('boost-devel');
+    exists('boost-url');
+    if (missing_packages.length > 0) {
+        throwCriticalError(`Missing essential packages. Install the following packages with your package manager:\n    ${missing_packages}`);
+    }
+    header(`Submodules`);
+    let no_missing_submodule_flag = true;
+    exists = (submodule: string) => {
+        if (existsSync(Path.join(project_root_dir, 'engine', 'external', submodule))) good(submodule, `found at '${Path.join('.', 'engine', 'external', submodule).toString()}'`);
+        else no_missing_submodule_flag = bad(submodule, `missing. Should be at '${Path.join('.', 'engine', 'external', submodule).toString()}'`);
+    }
+    exists('json');
+    exists('spdlog');
+    exists('termcolor');
+    exists('webview');
+    if (!no_missing_submodule_flag) {
+        throwCriticalError("Required submodules not found. Make sure you clone the repo with '--recurse-submodules' as a flag!");
+    }
+    logger.info(`Checking for rpm... [DONE]`);
+}
 
 try {
     switch (os_type) {
@@ -134,7 +180,7 @@ try {
                     deb();
                     break;
                 case "rpm":
-                    logger.warn("rpm is a WIP! Not doing anything...");
+                    rpm();
                     break;
                 default:
                     throwCriticalError("You're using a version of linux with an unsupported package manager! RenWeb currently only supports debian and rpm.");
