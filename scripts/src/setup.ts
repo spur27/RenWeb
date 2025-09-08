@@ -153,6 +153,7 @@ const rpm = () => {
     exists('pkgconf-pkg-config');
     exists('boost-devel');
     exists('boost-url');
+    // exists('rpmdevtools', warn, "is missing and is only used when building installers", false);
     if (missing_packages.length > 0) {
         throwCriticalError(`Missing essential packages. Install the following packages with your package manager:\n    ${missing_packages}`);
     }

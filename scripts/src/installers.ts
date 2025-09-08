@@ -1,5 +1,5 @@
 // add webview stuff
-import { rmSync, lstatSync, existsSync, mkdirSync, writeFileSync, copyFile, cpSync, mkdir, copyFileSync, chmodSync, readFileSync, renameSync, createWriteStream } from 'fs';
+import { rmSync, lstatSync, existsSync, mkdirSync, writeFileSync, copyFile, cpSync, mkdir, copyFileSync, readFileSync, renameSync, createWriteStream } from 'fs';
 import Path from 'path';
 import os from 'os';
 import { LogLevel, Logger } from '../lib/logger.ts';
@@ -68,7 +68,15 @@ const deb = () => {
     );
     mkdirSync(debian_app_path, { recursive: true });
     writeFileSync(Path.join(debian_app_path, `${info.simple_name}.desktop`), 
-        `[Desktop Entry]\nEncoding=UTF-8\nVersion=${info.version}\nComment=${info.description}\nType=Application\nTerminal=false\nExec=/usr/local/lib/${info.simple_name}/${info.simple_name}\nName=${info.name}\nIcon=/usr/share/icons/${info.simple_name}.ico`
+`[Desktop Entry]
+Encoding=UTF-8
+Version=${info.version}
+Comment=${info.description}
+Type=Application
+Terminal=false
+Exec=/usr/local/lib/${info.simple_name}/${info.simple_name}
+Name=${info.name}
+Icon=/usr/share/icons/${info.simple_name}.ico`
     )
     if (existsSync(icon_path)) {
         // if (existsSync(Path.join(debian_path, "renweb", "usr", "share", "icons"))) {
@@ -99,6 +107,156 @@ const deb = () => {
     archive.directory(Path.join(project_root_dir, 'build'), false);
     archive.finalize();
 }
+
+const rpm = () => {
+    const linux_installer_dir = Path.join(installer_dir, "linux");
+    const icon_path = Path.join(project_root_dir, "engine", "resource", `app.ico`);
+    const rpm_path = Path.join(linux_installer_dir, "rpmbuild");
+    const rpm_build = Path.join(rpm_path, "BUILD");
+    const rpm_rpms = Path.join(rpm_path, "RPMS");
+    const rpm_sources = Path.join(rpm_path, "SOURCES");
+    const rpm_specs = Path.join(rpm_path, "SPECS");
+    const rpm_srpms = Path.join(rpm_path, "SRPMS");
+
+    if (existsSync(linux_installer_dir)) {
+        logger.warn(`Linux installer dir already exist at '${linux_installer_dir}'. Clearing...`);
+        rmSync(linux_installer_dir, { recursive: true });
+    }
+    mkdirSync(linux_installer_dir);
+
+    // RPM
+    logger.info("Creating rpm package...");
+    if (existsSync(rpm_path)) {
+        logger.warn(`path '${rpm_path}' already exists. Removing...`);
+        rmSync(rpm_path, { recursive: true });
+    }
+    mkdirSync(rpm_path);
+    mkdirSync(rpm_build);
+    mkdirSync(rpm_rpms);
+    mkdirSync(Path.join(rpm_rpms, 'x86_64'));
+    mkdirSync(rpm_sources);
+    mkdirSync(rpm_specs);
+    mkdirSync(rpm_srpms);
+
+    // copy icon to SOURCES
+    cpSync(icon_path, Path.join(rpm_sources, `${info.simple_name}.ico`));
+
+    try {
+        execSync(
+        `tar czf ${Path.join(rpm_sources, `${info.simple_name}-${info.version}.tar.gz`)} --transform "s,^,${info.simple_name}-${info.version}/," -C ${project_root_dir} build`,
+        { stdio: 'inherit' }
+        );
+    } catch (e) {
+        logger.critical(`Failed to create source tarball: ${e}`);
+        return;
+    }
+
+    writeFileSync(Path.join(rpm_specs, `${info.simple_name}.spec`),
+`Name:          ${info.simple_name}
+Version:        ${info.version}
+Release:        1%{?dist}
+Summary:        ${info.description}
+License:        ${info.license}
+# URL:          
+Source0:        ${info.simple_name}-${info.version}.tar.gz
+BuildArch:      ${os_machine}
+Requires:       /bin/sh
+
+%global debug_package %{nil}
+
+%description
+${info.description}
+
+%prep
+%setup -q
+
+%build
+# nothing to build
+
+%preun
+# Remove per-user copy for the user who installed the package
+if [ "$SUDO_USER" != "root" ] && [ -n "$SUDO_USER" ]; then
+    USER_HOME=$(getent passwd "$SUDO_USER" | cut -d: -f6)
+    if [ -n "$USER_HOME" ]; then
+        rm -rf "$USER_HOME/.local/share/${info.simple_name}"
+        rm -f  "$USER_HOME/.local/share/applications/${info.simple_name}.desktop"
+        rm -f  "$USER_HOME/.local/share/icons/${info.simple_name}.ico"
+    fi
+fi
+
+%install
+# system-wide reference copy
+mkdir -p %{buildroot}/usr/share/${info.simple_name}
+cp -r build/* %{buildroot}/usr/share/${info.simple_name}/
+
+# launcher in PATH
+mkdir -p %{buildroot}/usr/bin
+cat > %{buildroot}/usr/bin/${info.simple_name} <<'EOF'
+#!/usr/bin/env bash
+# Ensure local copy exists
+if [ ! -d "$HOME/.local/share/${info.simple_name}" ]; then
+    mkdir -p "$HOME/.local/share"
+    cp -r /usr/share/${info.simple_name} "$HOME/.local/share/"
+fi
+exec "$HOME/.local/share/${info.simple_name}/${info.simple_name}" "$@"
+EOF
+chmod +x %{buildroot}/usr/bin/${info.simple_name}
+
+# desktop entry
+mkdir -p %{buildroot}/usr/share/applications
+cat > %{buildroot}/usr/share/applications/${info.simple_name}.desktop <<EOF
+[Desktop Entry]
+Encoding=UTF-8
+Version=${info.version}
+Comment=${info.description}
+Type=Application
+Terminal=false
+Exec=/usr/bin/${info.simple_name}
+Name=${info.name}
+Icon=/usr/share/icons/${info.simple_name}.ico
+EOF
+
+# install icon
+mkdir -p %{buildroot}/usr/share/icons
+cp ${icon_path} %{buildroot}/usr/share/icons/${info.simple_name}.ico
+
+%post
+if [ "$SUDO_USER" != "root" ] && [ -n "$SUDO_USER" ]; then
+    USER_HOME=$(getent passwd "$SUDO_USER" | cut -d: -f6)
+    if [ -n "$USER_HOME" ]; then
+        mkdir -p "$USER_HOME/.local/share/${info.simple_name}"
+        cp -rn /usr/share/${info.simple_name}/* "$USER_HOME/.local/share/${info.simple_name}/"
+        chown -R "$SUDO_USER":"$SUDO_USER" "$USER_HOME/.local/share/${info.simple_name}"
+    fi
+fi
+
+%files
+/usr/bin/${info.simple_name}
+/usr/share/${info.simple_name}
+/usr/share/applications/${info.simple_name}.desktop
+/usr/share/icons/${info.simple_name}.ico
+
+%changelog
+`);
+
+    try {
+        execSync(`rpmbuild --define "_topdir ${rpm_path}" -bb ${Path.join(rpm_specs, `${info.simple_name}.spec`)}`, { stdio: 'inherit' });
+    } catch (e) {
+        logger.critical(e);
+    }
+    cpSync(Path.join(rpm_rpms, os_machine), linux_installer_dir, { recursive: true });
+    rmSync(rpm_path, {recursive: true});
+
+    let output = createWriteStream(Path.join(linux_installer_dir, `${info.simple_name}.zip`));
+    let archive = archiver('zip');
+    output.on('close', () => {
+        logger.info(`Saved ${archive.pointer()} bytes to ./linux/${info.simple_name}.zip`);
+    });
+    archive.on('error', (err: Error) => { throw err });
+    archive.pipe(output);
+    archive.directory(Path.join(project_root_dir, 'build'), false);
+    archive.finalize();
+};
 
 const windows = () => {
     const windows_installer_dir = Path.join(installer_dir, "windows");
@@ -233,7 +391,7 @@ try {
                     deb();
                     break;
                 case "rpm":
-                    logger.warn("rpm is a WIP! Not doing anything...");
+                    rpm();
                     break;
                 default:
                     throwCriticalError("You're using a version of linux with an unsupported package manager! RenWeb currently only supports debian and rpm.");
