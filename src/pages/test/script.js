@@ -244,6 +244,19 @@ document.querySelector(".open_window").onclick = async () => {
     Window.openWindow(window_name, {single: single});
 };
 
+document.querySelector(".send_notif_1").onclick = async () => {
+    await BIND_sendNotif("test body");
+};
+
+document.querySelector(".send_notif_2").onclick = async () => {
+    await BIND_sendNotif("afweoifjaowie", "Test Summary");
+};
+
+document.querySelector(".send_notif_3").onclick = async () => {
+    await BIND_sendNotif("awfijawsoife", "awfoejfaow", `${await Util.getApplicationDirPath()}/resource/test.ico`);
+};
+
+
 
 
 

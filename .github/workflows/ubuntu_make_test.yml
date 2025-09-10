@@ -36,7 +36,8 @@ jobs:
             libgtk-3-0 \
             libwebkit2gtk-4.1-0 \
             pkg-config \
-            libboost-all-dev
+            libboost-all-dev \
+            libnotify-dev
 
     - name: make
       run: make

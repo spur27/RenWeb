@@ -61,6 +61,8 @@ export namespace FS {
         { return await BIND_copy(orig_path, new_path, settings) as boolean; }
     export async function chooseFiles(settings: FS.ChooseFileSettings={multiple:false, dirs:false, patterns:undefined, mimes:undefined}): Promise<(string[] | null)> 
         { return await BIND_chooseFiles(settings) as (string[] | null); }
+    export async function sendNotif(body: string, summary?: string, icon_path?: string): Promise<void> 
+        { await BIND_sendNotif(body, summary, icon_path); }
 };
 export namespace Window {
     export enum WebviewHint {
@@ -154,6 +156,7 @@ declare const BIND_ls:          (...args: any[]) => Promise<{}>;
 declare const BIND_rename:      (...args: any[]) => Promise<{}>;
 declare const BIND_copy:        (...args: any[]) => Promise<{}>;
 declare const BIND_chooseFiles: (...args: any[]) => Promise<{}>;
+declare const BIND_sendNotif:   (...args: any[]) => Promise<{}>;
 
 declare const BIND_saveSettings:            (...args: any[]) => Promise<{}>;
 declare const BIND_refreshSettings:         (...args: any[]) => Promise<{}>;

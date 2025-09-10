@@ -1,7 +1,7 @@
 // add webview stuff
 import webpack from 'webpack';
 import TerserWebpackPlugin from 'terser-webpack-plugin';
-import { readdirSync, lstatSync } from 'fs';
+import { readdirSync, lstatSync, cpSync, existsSync } from 'fs';
 import Path from 'path';
 import { LogLevel, Logger } from '../lib/logger.ts';
 import Chalk from 'chalk';
@@ -157,6 +157,8 @@ const exclude_types = [
 
 emptyDirSync(Path.join(project_root_dir, 'build', 'content'));
 emptyDirSync(Path.join(project_root_dir, 'build', 'assets'));
+emptyDirSync(Path.join(project_root_dir, 'build', 'resource'));
+cpSync(Path.join(project_root_dir, 'engine', 'resource'), Path.join(project_root_dir, 'build', 'resource'), {recursive: true});
 
 const pages_path = Path.join(project_root_dir, "src", "pages");
 (async () => { 

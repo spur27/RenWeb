@@ -76,31 +76,23 @@ Type=Application
 Terminal=false
 Exec=/usr/local/lib/${info.simple_name}/${info.simple_name}
 Name=${info.name}
-Icon=/usr/share/icons/${info.simple_name}.ico`
+Icon=/usr/local/lib/${info.simple_name}/resource/app.ico`
     )
-    if (existsSync(icon_path)) {
-        // if (existsSync(Path.join(debian_path, "renweb", "usr", "share", "icons"))) {
-        //     mkdirSync(Path.join(debian_path, "renweb", "usr", "share", "icons"), { recursive: true });
-        // }
-        cpSync(icon_path, debian_icon_path, { recursive: true });
-    } else {
-        logger.warn("No icon found.");
-    }
     mkdirSync(debian_bin_path, { recursive: true });
     writeFileSync(Path.join(debian_bin_path, info.simple_name), `exec ${Path.join("/", "usr", "local", "lib", info.simple_name, info.simple_name).toString()} "$@"`);
     execSync(`chmod +x ${Path.join(debian_bin_path, info.simple_name).toString()}`);
     // chmodSync(Path.join(debian_path, "renweb", "usr", "local", "bin", "renweb"), 755);
     cpSync(Path.join(project_root_dir, "build"), debian_lib_path, { recursive: true });
     try {
-        execSync(`dpkg-deb --build ${debian_package_path}`, { stdio: 'inherit' });
+        execSync(`dpkg-deb --build ${debian_package_path} ${Path.join(linux_installer_dir, `${info.simple_name}-${info.version}.${os_machine}.deb`)}`, { stdio: 'inherit' });
     } catch (e) {
         logger.critical(e);
     }
-    rmSync(debian_package_path, { recursive: true });
-    let output = createWriteStream(Path.join(linux_installer_dir, `${info.simple_name}.zip`));
+    rmSync(debian_path, { recursive: true });
+    let output = createWriteStream(Path.join(linux_installer_dir, `${info.simple_name}-${info.version}.${os_machine}.zip`));
     let archive = archiver('zip');
     output.on('close', () => {
-        logger.info(`Saved ${archive.pointer()} bytes to ./linux/${info.simple_name}.zip`);
+        logger.info(`Saved ${archive.pointer()} bytes to ./linux/${info.simple_name}-${info.version}.${os_machine}.zip`);
     });
     archive.on('error', (err: Error) => {throw err});
     archive.pipe(output);
@@ -181,6 +173,7 @@ if [ "$SUDO_USER" != "root" ] && [ -n "$SUDO_USER" ]; then
         rm -rf "$USER_HOME/.local/share/${info.simple_name}"
         rm -f  "$USER_HOME/.local/share/applications/${info.simple_name}.desktop"
         rm -f  "$USER_HOME/.local/share/icons/${info.simple_name}.ico"
+        rm -f  "%{buildroot}/usr/share/applications/${info.simple_name}.desktop"
     fi
 fi
 
@@ -202,24 +195,6 @@ exec "$HOME/.local/share/${info.simple_name}/${info.simple_name}" "$@"
 EOF
 chmod +x %{buildroot}/usr/bin/${info.simple_name}
 
-# desktop entry
-mkdir -p %{buildroot}/usr/share/applications
-cat > %{buildroot}/usr/share/applications/${info.simple_name}.desktop <<EOF
-[Desktop Entry]
-Encoding=UTF-8
-Version=${info.version}
-Comment=${info.description}
-Type=Application
-Terminal=false
-Exec=/usr/bin/${info.simple_name}
-Name=${info.name}
-Icon=/usr/share/icons/${info.simple_name}.ico
-EOF
-
-# install icon
-mkdir -p %{buildroot}/usr/share/icons
-cp ${icon_path} %{buildroot}/usr/share/icons/${info.simple_name}.ico
-
 %post
 if [ "$SUDO_USER" != "root" ] && [ -n "$SUDO_USER" ]; then
     USER_HOME=$(getent passwd "$SUDO_USER" | cut -d: -f6)
@@ -227,14 +202,24 @@ if [ "$SUDO_USER" != "root" ] && [ -n "$SUDO_USER" ]; then
         mkdir -p "$USER_HOME/.local/share/${info.simple_name}"
         cp -rn /usr/share/${info.simple_name}/* "$USER_HOME/.local/share/${info.simple_name}/"
         chown -R "$SUDO_USER":"$SUDO_USER" "$USER_HOME/.local/share/${info.simple_name}"
+        mkdir -p %{buildroot}/usr/share/applications
+        cat > %{buildroot}/usr/share/applications/${info.simple_name}.desktop <<EOF
+        [Desktop Entry]
+        Encoding=UTF-8
+        Version=${info.version}
+        Comment=${info.description}
+        Type=Application
+        Terminal=false
+        Exec=/usr/bin/${info.simple_name}
+        Name=${info.name}
+        Icon=$USER_HOME/.local/share/${info.simple_name}/resource/app.ico
+        EOF
     fi
 fi
 
 %files
 /usr/bin/${info.simple_name}
 /usr/share/${info.simple_name}
-/usr/share/applications/${info.simple_name}.desktop
-/usr/share/icons/${info.simple_name}.ico
 
 %changelog
 `);
@@ -247,12 +232,12 @@ fi
     cpSync(Path.join(rpm_rpms, os_machine), linux_installer_dir, { recursive: true });
     rmSync(rpm_path, {recursive: true});
 
-    let output = createWriteStream(Path.join(linux_installer_dir, `${info.simple_name}.zip`));
+    let output = createWriteStream(Path.join(linux_installer_dir, `${info.simple_name}-${info.version}.${os_machine}.zip`));
     let archive = archiver('zip');
     output.on('close', () => {
-        logger.info(`Saved ${archive.pointer()} bytes to ./linux/${info.simple_name}.zip`);
+        logger.info(`Saved ${archive.pointer()} bytes to ./linux/${info.simple_name}-${info.version}.${os_machine}.zip`);
     });
-    archive.on('error', (err: Error) => { throw err });
+    archive.on('error', (err: Error) => {throw err});
     archive.pipe(output);
     archive.directory(Path.join(project_root_dir, 'build'), false);
     archive.finalize();
@@ -369,10 +354,10 @@ SectionEnd
     execSync("makensis ../installers/windows/nsis/setup_wizard.nsi", { stdio: 'inherit' });
     renameSync(Path.join(nsis_dir, `${info.simple_name}-installer.exe`), Path.join(windows_installer_dir, `${info.simple_name}-installer.exe`));
     rmSync(nsis_dir, { recursive: true });
-    let output = createWriteStream(Path.join(windows_installer_dir, `${info.simple_name}.zip`));
+    let output = createWriteStream(Path.join(windows_installer_dir, `${info.simple_name}-${info.version}.${os_machine}.zip`));
     let archive = archiver('zip');
     output.on('close', () => {
-        logger.info(`Saved ${archive.pointer()} bytes to ./windows/${info.simple_name}.zip`);
+        logger.info(`Saved ${archive.pointer()} bytes to ./linux/${info.simple_name}-${info.version}.${os_machine}.zip`);
     });
     archive.on('error', (err: Error) => {throw err});
     archive.pipe(output);

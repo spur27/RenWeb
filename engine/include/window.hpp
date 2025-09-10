@@ -23,6 +23,7 @@ using WindowHandle = HWND;
 using WindowHandle = NSWindow*;
 #elif defined(__linux__)
 #include <gtk/gtk.h>
+#include <libnotify/notify.h>
 using WindowHandle = GtkWidget*;  // GtkWindow*
 #endif
 
@@ -72,6 +73,7 @@ namespace RenWeb {
             RenWeb::Window* show();
 
             std::vector<std::string> openChooseFilesDialog(bool=false, bool=false, RenWeb::ChooseFileDialogSettings* =nullptr);
+            RenWeb::Window* sendNotif(std::string, std::string="Summary", std::string=std::filesystem::path(RenWeb::Info::File::dir).append("resource").append("app.ico").string());
 
             void start();
     };

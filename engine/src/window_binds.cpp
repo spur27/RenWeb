@@ -57,7 +57,7 @@ RenWeb::Window* RenWeb::Window::bindAll() {
                 return "null";
             }
             std::ifstream file(path, std::ios::binary); // open in binary mode
-            if (!file) {
+            if (!file.good()) {
                 spdlog::error("Failed to open file for reading: " + path.string());
                 return "null";
             }
@@ -403,6 +403,20 @@ RenWeb::Window* RenWeb::Window::bindAll() {
             // ()
             boost::ignore_unused(req);
             return json{strToUint8arrVec(RenWeb::Info::File::dir)}[0].dump();
+        })
+        ->bindFunction("BIND_sendNotif", [w](const std::string& req) -> std::string {
+            // ()
+            json params = json::parse(req);
+            if (!params[2].is_null()) {
+                w->sendNotif(jsonToStr(params[0]), jsonToStr(params[1]), jsonToStr(params[2]));
+            } else if (!params[1].is_null()) {
+                w->sendNotif(jsonToStr(params[0]), jsonToStr(params[1]));
+            } else if (!params[0].is_null()) {
+                w->sendNotif(jsonToStr(params[0]));
+            } else {
+                spdlog::error("No notification body given.");
+            }
+            return "null";
         });
     return this;
 }

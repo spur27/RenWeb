@@ -104,6 +104,7 @@ const deb = () => {
     exists('pkg-config');
     exists('libboost-all-dev');
     exists('libboost-url-dev');
+    exists('libnotify-dev');
     if (missing_packages.length > 0) {
         throwCriticalError(`Missing essential packages. Install the following packages with your package manager:\n    ${missing_packages}`);
     }
@@ -153,6 +154,7 @@ const rpm = () => {
     exists('pkgconf-pkg-config');
     exists('boost-devel');
     exists('boost-url');
+    exists('libnotify-devel');
     // exists('rpmdevtools', warn, "is missing and is only used when building installers", false);
     if (missing_packages.length > 0) {
         throwCriticalError(`Missing essential packages. Install the following packages with your package manager:\n    ${missing_packages}`);

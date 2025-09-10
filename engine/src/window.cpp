@@ -1,4 +1,5 @@
 #include "../include/window.hpp"
+#include "info.hpp"
  
 RenWeb::Window::Window(unsigned short thread_cnt, unsigned short port)
   : webview::webview(false, nullptr)
@@ -366,6 +367,22 @@ std::vector<std::string> RenWeb::Window::openChooseFilesDialog(bool multi, bool 
 #endif
     return filepaths_vec;
 }
+
+RenWeb::Window* RenWeb::Window::sendNotif(std::string body, std::string summary, std::string icon_path) {
+#if defined(_WIN32)
+    spdlog::critical("sendNotif NOT IMPLEMENTED FOR apple");
+#elif defined(__APPLE__)
+    spdlog::critical("sendNotif NOT IMPLEMENTED FOR apple");
+#elif defined(__linux__)
+    notify_init(RenWeb::Info::App::name.c_str());
+    NotifyNotification* n = notify_notification_new(summary.c_str(), body.c_str(), icon_path.c_str());
+    notify_notification_show(n, nullptr);
+    g_object_unref(G_OBJECT(n));
+    notify_uninit();
+#endif
+    return this;
+}
+
 
 void RenWeb::Window::start() {
     this->refreshSettings()

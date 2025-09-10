@@ -116,7 +116,7 @@ ifeq ($(OS_NAME), Apple)
 	LIBS := -ldl 
 endif
 ifeq ($(OS_NAME), Linux)
-	LIBS := -lboost_system -lboost_url -lboost_thread -lboost_filesystem -lboost_program_options -ldl
+	LIBS := -lnotify -lboost_system -lboost_url -lboost_thread -lboost_filesystem -lboost_program_options -ldl
 endif
 # -----------------------------------------------------------------------------
 # Dynamic Linked Libraries
@@ -201,6 +201,8 @@ clean:
 	-not -path '$(BUILD_PATH)/assets' \
 	-not -path '$(BUILD_PATH)/content/*' \
 	-not -path '$(BUILD_PATH)/content' \
+	-not -path '$(BUILD_PATH)/resource/*' \
+	-not -path '$(BUILD_PATH)/resource' \
 	-exec rm -rf {} +
 	rm -rf $(OBJ_PATH)/*
 	$(call step,Cleaning [DONE])

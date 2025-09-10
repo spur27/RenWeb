@@ -49,7 +49,8 @@ jobs:
             webkit2gtk4.1 \
             pkgconf-pkg-config \
             boost-devel \
-            boost-url
+            boost-url \
+            libnotify-devel
 
     - name: make
       run: make

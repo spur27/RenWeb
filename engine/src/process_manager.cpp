@@ -91,6 +91,10 @@ bool RenWeb::ProcessManager::hasProcess(std::string process_name) {
 }
 
 void RenWeb::ProcessManager::bringToForeground(std::string process_name) {
+#if defined(__linux__)
+    spdlog::warn("Cannot work on linux as gtk is being used (can't raise windows using wayland). Doing nothing...");
+    return;
+#endif
     if (this->sub_processes.find(process_name) == this->sub_processes.end()) {
         spdlog::error("No process of name \"" + process_name + "\" exists! Can't bring to foreground.");
         return;
@@ -144,8 +148,6 @@ void RenWeb::ProcessManager::bringToForeground(std::string process_name) {
     // NSDictionary* errorInfo = nil;
     // [appleScript executeAndReturnError:&errorInfo];
     // [appleScript release];
-    spdlog::critical("bringToForefround is UNIMPLEMENTED");
-#elif defined(__linux__)
     spdlog::critical("bringToForefround is UNIMPLEMENTED");
 #endif
     } catch (const std::exception& e) {
