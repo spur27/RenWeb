@@ -245,17 +245,31 @@ document.querySelector(".open_window").onclick = async () => {
 };
 
 document.querySelector(".send_notif_1").onclick = async () => {
-    await BIND_sendNotif("test body");
+    await Util.sendNotif("test body");
 };
 
 document.querySelector(".send_notif_2").onclick = async () => {
-    await BIND_sendNotif("afweoifjaowie", "Test Summary");
+    await Util.sendNotif("afweoifjaowie", "Test Summary");
 };
 
 document.querySelector(".send_notif_3").onclick = async () => {
-    await BIND_sendNotif("awfijawsoife", "awfoejfaow", `${await Util.getApplicationDirPath()}/resource/test.ico`);
+    await Util.sendNotif("awfijawsoife", "awfoejfaow", `${await Util.getApplicationDirPath()}/resource/test.ico`);
 };
 
+document.querySelector(".open_uri_1").onclick = async () => {
+    await Log.info(`Attempting to open "https://www.youtube.com/watch?v=dQw4w9WgXcQ"`);
+    await Util.openURI("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
+};
+
+document.querySelector(".open_uri_2").onclick = async () => {
+    await Log.info(`Attempting to open "file://${await Util.getApplicationDirPath()}/log.txt"`);
+    await Util.openURI(`file://${await Util.getApplicationDirPath()}/log.txt`);
+};
+
+document.querySelector(".open_uri_3").onclick = async () => {
+    await Log.info(`Attempting to open "${await Util.getApplicationDirPath()}"`);
+    await Util.openURI(`${await Util.getApplicationDirPath()}`);
+};
 
 
 

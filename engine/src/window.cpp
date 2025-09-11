@@ -1,5 +1,6 @@
 #include "../include/window.hpp"
 #include "info.hpp"
+#include <boost/core/ignore_unused.hpp>
  
 RenWeb::Window::Window(unsigned short thread_cnt, unsigned short port)
   : webview::webview(false, nullptr)
@@ -370,7 +371,7 @@ std::vector<std::string> RenWeb::Window::openChooseFilesDialog(bool multi, bool 
 
 RenWeb::Window* RenWeb::Window::sendNotif(std::string body, std::string summary, std::string icon_path) {
 #if defined(_WIN32)
-    spdlog::critical("sendNotif NOT IMPLEMENTED FOR apple");
+    spdlog::critical("sendNotif NOT IMPLEMENTED FOR windows");
 #elif defined(__APPLE__)
     spdlog::critical("sendNotif NOT IMPLEMENTED FOR apple");
 #elif defined(__linux__)
@@ -379,6 +380,19 @@ RenWeb::Window* RenWeb::Window::sendNotif(std::string body, std::string summary,
     notify_notification_show(n, nullptr);
     g_object_unref(G_OBJECT(n));
     notify_uninit();
+#endif
+    return this;
+}
+
+RenWeb::Window* RenWeb::Window::openURI(std::string resource) {
+#if defined(_WIN32)
+    system(("start " + resource).c_str());
+    spdlog::critical("openInBrowser NOT TESTED FOR windows");
+#elif defined(__APPLE__)
+    system(("open " + resource).c_str());
+    spdlog::critical("openInBrowser NOT TESTED FOR apple");
+#elif defined(__linux__)
+    system(("xdg-open " + resource).c_str());
 #endif
     return this;
 }

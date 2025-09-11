@@ -14,7 +14,7 @@
 #include <map>
 #include <algorithm>
 #include <string>
-
+#include <cstdlib>  
 #if defined(_WIN32)
 #include <windows.h>
 using WindowHandle = HWND;
@@ -74,6 +74,7 @@ namespace RenWeb {
 
             std::vector<std::string> openChooseFilesDialog(bool=false, bool=false, RenWeb::ChooseFileDialogSettings* =nullptr);
             RenWeb::Window* sendNotif(std::string, std::string="Summary", std::string=std::filesystem::path(RenWeb::Info::File::dir).append("resource").append("app.ico").string());
+            RenWeb::Window* openURI(std::string);
 
             void start();
     };

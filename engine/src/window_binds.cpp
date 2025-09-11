@@ -417,6 +417,12 @@ RenWeb::Window* RenWeb::Window::bindAll() {
                 spdlog::error("No notification body given.");
             }
             return "null";
+        })
+        ->bindFunction("BIND_openURI", [w](const std::string& req) -> std::string {
+            // ()
+            json params = json::parse(req);
+            w->openURI(jsonToStr(params[0]));
+            return "null";
         });
     return this;
 }
