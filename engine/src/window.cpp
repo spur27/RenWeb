@@ -28,7 +28,7 @@ RenWeb::Window* RenWeb::Window::processContents() {
     // this->hide();
     this->reloadPage();
 #elif defined(__APPLE__)
-    spdlog::critical("hideUntilContentLoaded NOT IMPLEMENTED FOR apple");
+    spdlog::critical("processContents NOT IMPLEMENTED FOR apple");
 #elif defined(__linux__)
     this->reloadPage()
         ->hide();

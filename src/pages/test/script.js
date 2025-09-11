@@ -273,8 +273,6 @@ document.querySelector(".open_uri_3").onclick = async () => {
 
 
 
-
-
 (async () => {
     const path = await Util.getApplicationDirPath();
     document.querySelector(".read_file_msg").value = path;
