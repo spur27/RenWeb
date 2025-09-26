@@ -47,7 +47,7 @@ RenWeb::Window* RenWeb::Window::bindAll() {
   // FILE SYSTEM
         ->bindFunction("BIND_readFile", [](const std::string& req) -> std::string {
             // (path: string)
-            std::filesystem::path path (jsonToStr(json::parse(req)[0]));
+            std::filesystem::path path (jsonUint8arrToString(json::parse(req)[0]));
             if (!std::filesystem::exists(path)) {
                 spdlog::error("No file exists at " + path.string());
                 return "null";
@@ -70,7 +70,7 @@ RenWeb::Window* RenWeb::Window::bindAll() {
         ->bindFunction("BIND_writeFile", [](const std::string& req) -> std::string {
             // (path: string, contents: Uint8array, settings: {append: boolean=false})
             json params = json::parse(req);     
-            std::filesystem::path path (jsonToStr(params[0]));
+            std::filesystem::path path (jsonUint8arrToString(params[0]));
             std::vector<char> uint8array = (jsonUint8arrToVec(params[1]));
             bool append = (params[2]["append"].is_boolean() && (params[2]["append"].dump() == "true")) ? true : false;
             std::ios::openmode mode = std::ios::binary;
@@ -102,17 +102,17 @@ RenWeb::Window* RenWeb::Window::bindAll() {
         })
         ->bindFunction("BIND_exists", [](const std::string& req) -> std::string {
             // (path: string)
-            std::filesystem::path path (jsonToStr(json::parse(req)[0]));
+            std::filesystem::path path (jsonUint8arrToString(json::parse(req)[0]));
             return (std::filesystem::exists(path)) ? "true" : "false";
         })
         ->bindFunction("BIND_isDir", [](const std::string& req) -> std::string {
             // (path: string)
-            std::filesystem::path path (jsonToStr(json::parse(req)[0]));
+            std::filesystem::path path (jsonUint8arrToString(json::parse(req)[0]));
             return (std::filesystem::is_directory(path)) ? "true" : "false";
         })
         ->bindFunction("BIND_mkDir", [](const std::string& req) -> std::string {
             // (path: string)
-            std::filesystem::path path (jsonToStr(json::parse(req)[0]));
+            std::filesystem::path path (jsonUint8arrToString(json::parse(req)[0]));
             if (std::filesystem::exists(path)) {
                 spdlog::error("File/dir already exists at '" + path.string() + "'");
                 return "false";
@@ -129,7 +129,7 @@ RenWeb::Window* RenWeb::Window::bindAll() {
         ->bindFunction("BIND_rm", [](const std::string& req) -> std::string {
             // (path: string, settings: {recursive: boolean=false})
             json params = json::parse(req);     
-            std::filesystem::path path (jsonToStr(params[0]));
+            std::filesystem::path path (jsonUint8arrToString(params[0]));
             bool recursive = (params[1]["recursive"].is_boolean() && (params[1]["recursive"].dump() == "true")) ? true : false;
             std::error_code ec;
             if (!std::filesystem::exists(path)) {
@@ -158,7 +158,7 @@ RenWeb::Window* RenWeb::Window::bindAll() {
         })
         ->bindFunction("BIND_ls", [](const std::string& req) -> std::string {
             // (path: string)
-            std::filesystem::path path (jsonToStr(json::parse(req)[0]));
+            std::filesystem::path path (jsonUint8arrToString(json::parse(req)[0]));
             if (!std::filesystem::is_directory(path)) {
                 spdlog::error("Path entered to ls wasn't a dir: " + path.string());
                 return "null";
@@ -166,7 +166,7 @@ RenWeb::Window* RenWeb::Window::bindAll() {
             std::error_code ec;
             json array = json::array();
             for (const auto& entry : std::filesystem::directory_iterator(path, ec)) {
-                array.push_back(entry.path().string());
+                array.push_back(strToUint8arrVec(formatPath(entry.path().string())));
             }
             if (ec) {
                 spdlog::error(ec.message());
@@ -178,8 +178,8 @@ RenWeb::Window* RenWeb::Window::bindAll() {
         ->bindFunction("BIND_rename", [](const std::string& req) -> std::string {
             // (orig_path: string, new_path: string, settings: {overwrite: boolean=false})
             json params = json::parse(req);     
-            std::filesystem::path orig_path (jsonToStr(params[0]));
-            std::filesystem::path new_path (jsonToStr(params[1]));
+            std::filesystem::path orig_path (jsonUint8arrToString(params[0]));
+            std::filesystem::path new_path (jsonUint8arrToString(params[1]));
             bool overwrite = (params[2]["overwrite"].is_boolean() && (params[2]["overwrite"].dump() == "true")) ? true : false;
             std::error_code ec;
             if (!std::filesystem::exists(orig_path)) {
@@ -210,8 +210,8 @@ RenWeb::Window* RenWeb::Window::bindAll() {
         ->bindFunction("BIND_copy", [](const std::string& req) -> std::string {
             // (orig_path: string, new_path: string, settings: {overwrite: boolean=false})
             json params = json::parse(req);     
-            std::filesystem::path orig_path (jsonToStr(params[0]));
-            std::filesystem::path new_path (jsonToStr(params[1]));
+            std::filesystem::path orig_path (jsonUint8arrToString(params[0]));
+            std::filesystem::path new_path (jsonUint8arrToString(params[1]));
             bool overwrite = (params[2]["overwrite"].is_boolean() && (params[2]["overwrite"].dump() == "true")) ? true : false;
             std::error_code ec;
             if (!std::filesystem::exists(orig_path)) {
@@ -245,46 +245,25 @@ RenWeb::Window* RenWeb::Window::bindAll() {
         })
         ->bindFunction("BIND_chooseFiles",[w](const std::string& req) -> std::string {
             // ({multiple: boolean, dirs: boolean, (patterns | mimes): [name: string, rules: string[]]})
-            json settings = (json::parse(req)[0]);
-            std::vector<std::string> filepaths;
-            if (settings.is_object()) {
-                bool multi = false;
-                bool dir = false;
-                multi = settings.value("multiple", false);
-                dir = settings.value("dirs", false);
-                spdlog::info("multiple: " + std::to_string(multi) + " dirs: " + std::to_string(dir));
-                RenWeb::ChooseFileDialogSettings* filteration = nullptr;
-                json filter_arr;
-                auto set_filters = [&](const std::string filter_name){
-                    if ((filter_arr = settings[filter_name]).is_array()) {
-                        if (filteration == nullptr) filteration = new ChooseFileDialogSettings();
-                        for (auto& i : filter_arr) {
-                            if (i.is_array() && i[1].is_array()) {
-                                auto filter_pair = std::make_pair<std::string, std::vector<std::string>>(jsonToStr(i[0]), {});
-                                for (auto& j : i[1]) {
-                                    filter_pair.second.push_back(jsonToStr(j));
-                                }
-                                filteration->patterns.push_back(filter_pair);
-                            }
-                        }
-                    }
-                };
-                set_filters("patterns");
-                set_filters("mimes");
-                filepaths = w->openChooseFilesDialog(multi, dir, filteration);
-                if (filteration != nullptr) delete filteration;
-            } else {
-                filepaths = w->openChooseFilesDialog();
+            bool multi = jsonToStr(json::parse(req)[0]) == "true";
+            bool dirs = jsonToStr(json::parse(req)[1]) == "true";
+            std::vector<std::string> filtration_vec = {};
+            json filtration = json::parse(req)[2];
+            if (filtration.is_array()) {
+                for (auto& i : filtration) {
+                    filtration_vec.push_back(jsonUint8arrToString(i));
+                }
             }
-            if (filepaths.empty()) {
-                spdlog::info("It seems no file was chosen");
-                return "null";
+            json initial_path = json::parse(req)[3];
+            std::string initial_path_str = RenWeb::Info::File::dir;
+            if (initial_path.is_string()) {
+                initial_path_str = jsonToStr(initial_path);
             }
-            json filenames_arr = json::array();
-            for (auto& i : filepaths) {
-                filenames_arr.push_back(i);
+            json num_vec_vec = json::array();
+            for (auto i : w->openChooseFilesDialog(multi, dirs, filtration_vec, initial_path_str)) {
+                num_vec_vec.push_back(json(strToUint8arrVec(i)));
             }
-            return filenames_arr.dump();
+            return num_vec_vec.dump();
         })
   // SETTINGS
         ->bindFunction("BIND_saveSettings", [](const std::string& req) -> std::string {
@@ -343,7 +322,7 @@ RenWeb::Window* RenWeb::Window::bindAll() {
         ->bindFunction("BIND_openWindow", [w](const std::string& req) -> std::string {
             // (uri: string="_", settings: {single: boolean=false})
             json params = json::parse(req);
-            std::string uri = jsonToStr(params[0]);
+            std::string uri = jsonUint8arrToString(params[0]);
             bool single = (params[1]["single"].is_boolean() && (params[1]["single"].dump() == "true")) ? true : false;
             if (uri.empty() || (uri == "_")) {
                 spdlog::debug(std::string("Attempting to start duplicate process. Single? ") + ((single) ? "true" : "false"));
@@ -399,6 +378,17 @@ RenWeb::Window* RenWeb::Window::bindAll() {
             boost::ignore_unused(req);
             return std::to_string(boost::this_process::get_id());
         })
+        ->bindFunction("BIND_getOS", [](const std::string& req) -> std::string {
+            // ()
+            boost::ignore_unused(req);
+#if defined(_WIN32)
+            return strToJsonStr("Windows");
+#elif defined(__APPLE__)
+            return strToJsonStr("Apple");
+#elif defined(__linux__)
+            return strToJsonStr("Linux");
+#endif
+        })
         ->bindFunction("BIND_getApplicationDirPath", [](const std::string& req) -> std::string {
             // ()
             boost::ignore_unused(req);
@@ -408,11 +398,11 @@ RenWeb::Window* RenWeb::Window::bindAll() {
             // ()
             json params = json::parse(req);
             if (!params[2].is_null()) {
-                w->sendNotif(jsonToStr(params[0]), jsonToStr(params[1]), jsonToStr(params[2]));
+                w->sendNotif(jsonUint8arrToString(params[0]), jsonUint8arrToString(params[1]), formatPath(jsonUint8arrToString(params[2])));
             } else if (!params[1].is_null()) {
-                w->sendNotif(jsonToStr(params[0]), jsonToStr(params[1]));
+                w->sendNotif(jsonUint8arrToString(params[0]), jsonUint8arrToString(params[1]));
             } else if (!params[0].is_null()) {
-                w->sendNotif(jsonToStr(params[0]));
+                w->sendNotif(jsonUint8arrToString(params[0]));
             } else {
                 spdlog::error("No notification body given.");
             }
@@ -421,7 +411,15 @@ RenWeb::Window* RenWeb::Window::bindAll() {
         ->bindFunction("BIND_openURI", [w](const std::string& req) -> std::string {
             // ()
             json params = json::parse(req);
-            w->openURI(jsonToStr(params[0]));
+            std::string resource = jsonUint8arrToString(params[0]);
+            if (RenWeb::WebServer::isURI(resource)) {
+                for (int i = 0; i < resource.length(); i++) {
+                    if (resource[i] == '\\') resource[i] = '/';
+                }
+                w->openURI(resource);
+            } else {
+                w->openURI(formatPath(resource));
+            }
             return "null";
         });
     return this;

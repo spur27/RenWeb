@@ -349,6 +349,13 @@ void RenWeb::Listener::on_accept(beast::error_code ec,tcp::socket socket) {
 // ----------------------------------------- //
 // ----------------------------------------- //
 // ----------------------------------------- //
+/*static*/ bool RenWeb::WebServer::isURI(std::string maybe_uri) {
+    // "\\b((?:https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:, .;]*[-a-zA-Z0-9+&@#/%=~_|])"
+    const boost::regex url_regex(
+        "^(http://|https://|file://).*",
+        boost::regex::icase);
+    return boost::regex_match(maybe_uri, url_regex);
+}
 
 std::string RenWeb::WebServer::getURL() {
     if (this->listener != nullptr) {

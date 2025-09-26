@@ -12,6 +12,7 @@
 #include <boost/beast/core/string_type.hpp>
 #include <boost/beast/http/message.hpp>
 #include <boost/beast/http/string_body.hpp>
+#include <boost/regex.hpp>
 #include <map>
 #include <memory>
 #include <spdlog/spdlog.h>
@@ -87,6 +88,7 @@ namespace RenWeb {
             // std::make_shared<RenWeb::Web::Listener>;
         public:
             std::string getURL();
+            static bool isURI(std::string);
             WebServer(unsigned short, unsigned short, std::string="127.0.0.1");
             ~WebServer();
     };

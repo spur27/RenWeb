@@ -10,3 +10,6 @@
 [submodule "engine/external/termcolor"]
 	path = engine/external/termcolor
 	url = https://github.com/ikalnytskyi/termcolor.git
+[submodule "engine/external/portable-file-dialogs"]
+	path = engine/external/portable-file-dialogs
+	url = https://github.com/samhocevar/portable-file-dialogs.git

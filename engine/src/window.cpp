@@ -25,7 +25,6 @@ RenWeb::Window::~Window() {
 RenWeb::Window* RenWeb::Window::processContents() {
     this->set_html("<html\"><head><style>html { backgroundColor: black; width: 100vw; height: 100vh; }</style></head></html>");
 #if defined(_WIN32)
-    // this->hide();
     this->reloadPage();
 #elif defined(__APPLE__)
     spdlog::critical("processContents NOT IMPLEMENTED FOR apple");
@@ -34,14 +33,6 @@ RenWeb::Window* RenWeb::Window::processContents() {
         ->hide();
 #endif
     return this;
-}
-
-bool RenWeb::Window::isURI(std::string maybe_uri) {
-    // "\\b((?:https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:, .;]*[-a-zA-Z0-9+&@#/%=~_|])"
-    const boost::regex url_regex(
-        "\\b((?:https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:, .;]*[-a-zA-Z0-9+&@#/%=~_|])",
-        boost::regex::icase);
-    return boost::regex_match(maybe_uri, url_regex);
 }
 
 RenWeb::Window* RenWeb::Window::setSize(unsigned int width, unsigned int height, webview_hint_t hint) {
@@ -114,7 +105,7 @@ RenWeb::Window* RenWeb::Window::reloadPage() {
 
 RenWeb::Window* RenWeb::Window::navigatePage(std::string uri) {
     if (uri != "_") RenWeb::Info::App::page = uri;
-    if (this->isURI(RenWeb::Info::App::page)) {
+    if (RenWeb::WebServer::isURI(RenWeb::Info::App::page)) {
         spdlog::warn("Navigating to page " + RenWeb::Info::App::page);
         this->navigate(RenWeb::Info::App::page);
     } else {
@@ -295,18 +286,7 @@ RenWeb::Window* RenWeb::Window::show() {
     return this;
 }
 
-std::vector<std::string> RenWeb::Window::openChooseFilesDialog(bool multi, bool dirs, RenWeb::ChooseFileDialogSettings* filtration) {
-    std::vector<std::string> filepaths_vec{};
-#if defined(_WIN32)
-    boost::ignore_unused(multi);
-    boost::ignore_unused(dirs);
-    boost::ignore_unused(filtration);
-    spdlog::critical("open file dialog NOT IMPLEMENTED FOR windows");
-#elif defined(__APPLE__)
-    spdlog::critical("open file dialog NOT IMPLEMENTED FOR apple");
-#elif defined(__linux__)
-    auto window_widget = this->window().value();
-    // Create the file chooser dialog
+std::vector<std::string> RenWeb::Window::openChooseFilesDialog(bool multi, bool dirs, std::vector<std::string> filtration, std::string initial_dir) {
     std::stringstream instructions;
     instructions << "Choose ";
     if (multi) {
@@ -324,63 +304,18 @@ std::vector<std::string> RenWeb::Window::openChooseFilesDialog(bool multi, bool 
             instructions << " file";
         }
     }
-    GtkWidget *dialog = gtk_file_chooser_dialog_new(instructions.str().c_str(), GTK_WINDOW(window_widget),
-                                         (dirs) ? GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER : GTK_FILE_CHOOSER_ACTION_OPEN,
-                                         "_Cancel", GTK_RESPONSE_CANCEL,
-                                         "_Open", GTK_RESPONSE_OK,
-                                         NULL);
-    gtk_file_chooser_set_select_multiple(GTK_FILE_CHOOSER(dialog), multi);
-    if (filtration != nullptr) {
-        for (const auto& i : filtration->patterns) {
-            auto filter = gtk_file_filter_new();
-            gtk_file_filter_set_name(filter, i.first.c_str());
-            for (const auto& j : i.second) {
-                spdlog::info("Adding " + j);
-                gtk_file_filter_add_pattern(filter, j.c_str());
-            }
-            gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dialog), filter);
-        }
-        for (const auto& i : filtration->mimes) {
-            auto filter = gtk_file_filter_new();
-            gtk_file_filter_set_name(filter, i.first.c_str());
-            for (const auto& j : i.second) {
-                gtk_file_filter_add_pattern(filter, j.c_str());
-            }
-            gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dialog), filter);
-        }
-    }
-    if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK) {
-        // Get the selected file path
-        auto filepaths = gtk_file_chooser_get_filenames(GTK_FILE_CHOOSER(dialog));
-        auto curr_filepath = filepaths;
-        while (curr_filepath != nullptr) {
-            filepaths_vec.push_back(std::string(static_cast<gchar*>(curr_filepath->data)));
-            // g_free(curr_filepath);
-            curr_filepath = curr_filepath->next;
-        }
-        g_slist_free(filepaths);
-        spdlog::info("Selected " + std::to_string(filepaths_vec.size()) + " files.");
+    std::vector<std::string> filepaths;
+    if (dirs) {
+        filepaths.push_back(pfd::select_folder(instructions.str(), initial_dir, (multi) ? pfd::opt::multiselect : pfd::opt::none).result());
     } else {
-        spdlog::error("Could not continue with choose file.");
+        filepaths = pfd::open_file(instructions.str(), initial_dir, filtration, (multi) ? pfd::opt::multiselect : pfd::opt::none).result();
     }
-    // Destroy the dialog
-    gtk_widget_destroy(dialog);
-#endif
-    return filepaths_vec;
+    return filepaths;
 }
 
-RenWeb::Window* RenWeb::Window::sendNotif(std::string body, std::string summary, std::string icon_path) {
-#if defined(_WIN32)
-    spdlog::critical("sendNotif NOT IMPLEMENTED FOR windows");
-#elif defined(__APPLE__)
-    spdlog::critical("sendNotif NOT IMPLEMENTED FOR apple");
-#elif defined(__linux__)
-    notify_init(RenWeb::Info::App::name.c_str());
-    NotifyNotification* n = notify_notification_new(summary.c_str(), body.c_str(), icon_path.c_str());
-    notify_notification_show(n, nullptr);
-    g_object_unref(G_OBJECT(n));
-    notify_uninit();
-#endif
+RenWeb::Window* RenWeb::Window::sendNotif(std::string title, std::string message, std::string icon_path) {
+    // Fork this library and give it more functionality to do what you want soon
+    pfd::notify(title, message);
     return this;
 }
 

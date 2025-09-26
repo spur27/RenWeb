@@ -9,14 +9,15 @@
 #include <string>
 #include <spdlog/spdlog.h>
 #include <boost/process.hpp>
-#include <boost/regex.hpp>
 #include <webview/webview.h>
 #include <map>
 #include <algorithm>
 #include <string>
 #include <cstdlib>  
+#include <portable-file-dialogs.h>
 #if defined(_WIN32)
 #include <windows.h>
+#include <commdlg.h> 
 using WindowHandle = HWND;
 #elif defined(__APPLE__)
 #include <Cocoa/Cocoa.h>
@@ -29,14 +30,9 @@ using WindowHandle = GtkWidget*;  // GtkWindow*
 
 
 namespace RenWeb {
-    struct ChooseFileDialogSettings {
-        std::vector<std::pair<std::string, std::vector<std::string>>> patterns = {};
-        std::vector<std::pair<std::string, std::vector<std::string>>> mimes = {};
-    };
     class Window : private webview::webview {
         private:
             std::map<std::string, sync_binding_t> bind_cache;
-            bool isURI(std::string);
             RenWeb::Window* processContents();
         public:
             RenWeb::ProcessManager process_manager;
@@ -72,7 +68,7 @@ namespace RenWeb {
             RenWeb::Window* hide();
             RenWeb::Window* show();
 
-            std::vector<std::string> openChooseFilesDialog(bool=false, bool=false, RenWeb::ChooseFileDialogSettings* =nullptr);
+            std::vector<std::string> openChooseFilesDialog(bool=false, bool=false, std::vector<std::string> filteration=std::vector<std::string>(), std::string=RenWeb::Info::File::dir);
             RenWeb::Window* sendNotif(std::string, std::string="Summary", std::string=std::filesystem::path(RenWeb::Info::File::dir).append("resource").append("app.ico").string());
             RenWeb::Window* openURI(std::string);
 

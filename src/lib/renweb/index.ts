@@ -34,33 +34,28 @@ export namespace FS {
     export type RenameCopySettings = {
         overwrite: boolean
     }
-    export type ChooseFileSettings = {
-        multiple: boolean,
-        dirs: boolean,
-        patterns: ([string,  string[]] | undefined),
-        mimes: ([string,  string[]] | undefined) 
-    }
     // ---------------------------------------------  
     export async function readFile(path: string): Promise<(Uint8Array | null)> 
-        { const arr = await BIND_readFile(path); if (arr == null) return null; else return new Uint8Array(arr as  number[]); }
+        { const arr = await BIND_readFile(Util.toUint8array(path)); if (arr == null) return null; else return new Uint8Array(arr as  number[]); }
     export async function writeFile(path: string, contents: {}, settings: FS.WriteSettings={indent:DEFAULT_INDENT, append:false}): Promise<boolean> 
-        { return await BIND_writeFile(path, Util.toUint8array(contents, settings.indent), settings) as boolean; }
+        { return await BIND_writeFile(Util.toUint8array(path), Util.toUint8array(contents, settings.indent), settings) as boolean; }
     export async function exists(path: string): Promise<boolean> 
-        { return await BIND_exists(path) as boolean; }
+        { return await BIND_exists(Util.toUint8array(path)) as boolean; }
     export async function isDir(path: string): Promise<boolean> 
-        { return await BIND_isDir(path) as boolean; }
+        { return await BIND_isDir(Util.toUint8array(path)) as boolean; }
     export async function mkDir(path: string): Promise<boolean> 
-        { return await BIND_mkDir(path) as boolean; }
+        { return await BIND_mkDir(Util.toUint8array(path)) as boolean; }
     export async function rm(path: string, settings: FS.RmSettings={recursive:false}): Promise<boolean> 
-        { return await BIND_rm(path, settings) as boolean; }
+        { return await BIND_rm(Util.toUint8array(path), settings) as boolean; }
     export async function ls(path: string): Promise<(string[] | null)> 
-        { return await BIND_ls(path) as (string[] | null); }
+        { const files = (await BIND_ls(Util.toUint8array(path))) as number[][]; if (files == null) return null; else { const uint8arr_files: Uint8Array[] = []; files.forEach((el) => uint8arr_files.push(new Uint8Array(el))); return Util.fromArrayUint8array(uint8arr_files); } }
     export async function rename(orig_path: string, new_path: string, settings: FS.RenameCopySettings={overwrite:false}): Promise<boolean> 
-        { return await BIND_rename(orig_path, new_path, settings) as boolean; }
+        { return await BIND_rename(Util.toUint8array(orig_path), Util.toUint8array(new_path), settings) as boolean; }
     export async function copy(orig_path: string, new_path: string, settings: FS.RenameCopySettings={overwrite:false}): Promise<boolean> 
-        { return await BIND_copy(orig_path, new_path, settings) as boolean; }
-    export async function chooseFiles(settings: FS.ChooseFileSettings={multiple:false, dirs:false, patterns:undefined, mimes:undefined}): Promise<(string[] | null)> 
-        { return await BIND_chooseFiles(settings) as (string[] | null); }
+        { return await BIND_copy(Util.toUint8array(orig_path), Util.toUint8array(new_path), settings) as boolean; }
+    export async function chooseFiles(multi?: boolean, dirs?: boolean, filtration?: string[], initial_dir?: string): Promise<(string[] | null)> 
+        { const files = await BIND_chooseFiles(multi, dirs, (filtration == null) ? null : Util.arrayToUint8array(filtration), (initial_dir == null) ? null : Util.toUint8array(initial_dir)); if (files == null) 
+            return null; else { const conv_files: Uint8Array[] = []; (files as []).forEach(el => conv_files.push(new Uint8Array(el))); return Util.fromArrayUint8array(conv_files); } }
 };
 export namespace Window {
     export enum WebviewHint {
@@ -104,7 +99,7 @@ export namespace Window {
     export async function close(): Promise<void> 
         { await BIND_close(); }
     export async function openWindow(uri: string="_", settings: Window.OpenWindowSettings={single:false}): Promise<void> 
-        { await BIND_openWindow(uri, settings); }
+        { await BIND_openWindow(Util.toUint8array(uri), settings); }
     export async function minimize(): Promise<void> 
         { await BIND_minimize(); }
     export async function maximize(): Promise<void> 
@@ -119,19 +114,25 @@ export namespace Window {
 export namespace Util {
     export async function getPID(): Promise<number> 
         { return await BIND_getPID() as number; }
+    export async function getOS(): Promise<string> 
+        { return await BIND_getOS() as string; }
     export async function getApplicationDirPath(): Promise<string> 
         { return Util.fromUint8array(new Uint8Array(await BIND_getApplicationDirPath() as number[])) ?? "" as string; }
-    export async function sendNotif(body: string, summary?: string, icon_path?: string): Promise<void> 
-        { await BIND_sendNotif(body, summary, icon_path); }
+    export async function sendNotif(title: string, message?: string, icon_path?: string): Promise<void> 
+        { await BIND_sendNotif(Util.toUint8array(title), (message == null) ? null : Util.toUint8array(message), (icon_path == null) ? null : Util.toUint8array(icon_path)); }
     export async function openURI(resource: string): Promise<void> 
-        { await BIND_openURI(resource); }
+        { await BIND_openURI(Util.toUint8array(resource)); }
     // -------------------NON BINDINGS--------------------------        
     export function isNullish(variable: {}): boolean 
         { return (variable == null || variable == undefined); }
     export function isString(variable: {}): boolean 
         { return (typeof variable == 'string'); }
+    export function arrayToUint8array(variable: {}[], indent=2): Uint8Array[] 
+        { const encoded_arr: Uint8Array[] = []; variable.forEach((el) => encoded_arr.push(Util.toUint8array(el, indent))); return encoded_arr}
     export function toUint8array(variable: {}, indent=2): Uint8Array 
         { return ((new TextEncoder()).encode((isString(variable)) ? variable as string : JSON.stringify(variable, null, indent))); }
+    export function fromArrayUint8array(uint8arrays: Uint8Array[]): (string[] | null) 
+        { try { const decoded_arr: string[] = []; uint8arrays.forEach((el) => { const result = Util.fromUint8array(el); if (result != null) decoded_arr.push(result); }); return decoded_arr; } catch (e) { Log.error((e as Error).message); return null } }
     export function fromUint8array(uint8array: Uint8Array): (string | null) 
         { try { return ((new TextDecoder()).decode(uint8array)) } catch (e) { Log.error((e as Error).message); return null; } }
 };
@@ -175,6 +176,7 @@ declare const BIND_hide:                    (...args: any[]) => Promise<{}>;
 declare const BIND_show:                    (...args: any[]) => Promise<{}>;
 
 declare const BIND_getPID:                (...args: any[]) => Promise<{}>;
+declare const BIND_getOS:                 (...args: any[]) => Promise<{}>;
 declare const BIND_getApplicationDirPath: (...args: any[]) => Promise<{}>;
 declare const BIND_sendNotif:             (...args: any[]) => Promise<{}>;
 declare const BIND_openURI:               (...args: any[]) => Promise<{}>;

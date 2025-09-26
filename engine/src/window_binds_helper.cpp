@@ -53,3 +53,20 @@ std::string RWBH::jsonUint8arrToString(json json_v) {
     else return std::string{vec.begin(), vec.end()};
 }
 
+std::string RWBH::formatPath(std::string path) {
+    if (RenWeb::WebServer::isURI(path)) {
+        return path;
+    }
+#if defined(_WIN32)
+    // this->hide();
+    for (int i = 0; i < path.length(); i++) {
+        if (path[i] == '/') path[i] = '\\';
+    }
+    return path;
+#else 
+    for (int i = 0; i < path.length(); i++) {
+        if (path[i] == '\\') path[i] = '/';
+    }
+    return path;
+#endif
+}

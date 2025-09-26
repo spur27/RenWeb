@@ -167,7 +167,7 @@ document.querySelector(".choose_files").onclick = async () => {
     const dirs = document.querySelector(".dirs").checked;
     const multiple = document.querySelector(".multiple").checked;
     await Log.debug(`Opening file dialog...`);
-    const files = await FS.chooseFiles({multiple: multiple, dirs: dirs});
+    const files = await FS.chooseFiles(multiple, dirs);
     if (files == null) {
         document.querySelector(".choose_files").style.backgroundColor = "red";
         document.querySelector(".choose_files_output").textContent = "[ERROR] File dialog cancelled";
@@ -267,6 +267,13 @@ document.querySelector(".open_uri_2").onclick = async () => {
 };
 
 document.querySelector(".open_uri_3").onclick = async () => {
+    await Log.info(`Attempting to open "${await Util.getApplicationDirPath()}/log.txt"`);
+    await Util.openURI(`${await Util.getApplicationDirPath()}/log.txt`);
+};
+// Anything with paths needs to figure out the path as an array rather than a string to provide the appropriate log
+// 1) change everything with strings to do the array bs
+// 2) add C++ path checker for all paths
+document.querySelector(".open_uri_4").onclick = async () => {
     await Log.info(`Attempting to open "${await Util.getApplicationDirPath()}"`);
     await Util.openURI(`${await Util.getApplicationDirPath()}`);
 };

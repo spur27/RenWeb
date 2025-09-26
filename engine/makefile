@@ -49,7 +49,7 @@ else
 	CXX := $(CROSS_COMPILE)g++
 	CXXFLAGS := -MMD -MP
 	ifeq ($(TARGET), debug)
-		CXXFLAGS += -g -O0 -Wall -Wextra  -Wno-missing-braces -Wcast-qual -Wpointer-arith -Wunused 
+		CXXFLAGS += -g -O0 -Wall -Wextra -Wno-missing-braces -Wcast-qual -Wpointer-arith -Wunused 
 	else
 		CXXFLAGS += -O3 -flto -s
 	endif
@@ -103,6 +103,7 @@ SRC_PATH :=    ./src
 OBJ_PATH :=    $(SRC_PATH)/.build
 INC_PATH :=    ./include
 EXTERN_INC_PATHS := \
+	$(addprefix -I, $(wildcard external/*/)) \
 	$(addprefix -I, $(wildcard external/*/include)) \
 	$(addprefix -I, external/webview/core/include)
 RC_PATH :=    ./src/.build/app.res
@@ -110,7 +111,7 @@ RC_PATH :=    ./src/.build/app.res
 # Static Linked Libraries
 # -----------------------------------------------------------------------------
 ifeq ($(OS_NAME), Windows)
-	LIBS :=  
+	LIBS := comdlg32.lib
 endif
 ifeq ($(OS_NAME), Apple)
 	LIBS := -ldl 
@@ -142,11 +143,7 @@ $(BUILD_PATH)/$(EXE): $(OBJS) | $(BUILD_PATH)
 	$(call step,Linking Executable,$@,of link type,$(LINKTYPE))
 ifeq ($(OS_NAME),Windows)
 	npm run script:gen_resource
-ifeq ($(LINKTYPE),shared)
 	$(CXX) $(OBJS) ./src/.build/app.res $(CXXFLAGS) /link $(LIBS) /SUBSYSTEM:WINDOWS /OUT:$@
-else
-	$(CXX) $(OBJS) ./src/.build/app.res $(CXXFLAGS) /SUBSYSTEM:WINDOWS /OUT:$@
-endif
 else 
 ifeq ($(LINKTYPE),shared)
 	$(call warn,Shared for unix isn't implemented yet! Using static)

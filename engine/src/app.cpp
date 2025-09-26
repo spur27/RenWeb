@@ -46,6 +46,11 @@ void RenWeb::App::run(int argc, char** argv) {
             }
         }
         spdlog::actual_level = spdlog::level::level_enum(log_level);
+#if defined(_WIN32)
+        if (spdlog::actual_level < spdlog::level::info) {
+            AllocConsole();
+        }
+#endif
         spdlog::refresh();
         RenWeb::Info::App::loadFromConfigFile();
         // setup everything else now

@@ -38,7 +38,7 @@ using json = nlohmann::json;
 
 namespace RenWeb {
     namespace Info {
-        class File {
+        /*static*/ class File {
             private: 
             public:
                 static inline std::string name 
@@ -49,7 +49,7 @@ namespace RenWeb {
                     = boost::dll::program_location().string();
                 static void refresh();
         };
-        class App {
+        /*static*/ class App {
             private:
             public:
                 inline static std::string page = RENWEB_INFO_DEFAULT_PAGE;
