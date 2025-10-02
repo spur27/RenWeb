@@ -1,4 +1,5 @@
 #include "../include/window_binds_helper.hpp"
+#include <cstddef>
 
 namespace RWBH = RenWeb::BindingHelpers;
 
@@ -59,12 +60,12 @@ std::string RWBH::formatPath(std::string path) {
     }
 #if defined(_WIN32)
     // this->hide();
-    for (int i = 0; i < path.length(); i++) {
+    for (size_t i = 0; i < path.length(); i++) {
         if (path[i] == '/') path[i] = '\\';
     }
     return path;
 #else 
-    for (int i = 0; i < path.length(); i++) {
+    for (size_t i = 0; i < path.length(); i++) {
         if (path[i] == '\\') path[i] = '/';
     }
     return path;

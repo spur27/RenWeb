@@ -47,7 +47,7 @@ RenWeb::Window* RenWeb::Window::bindAll() {
   // FILE SYSTEM
         ->bindFunction("BIND_readFile", [](const std::string& req) -> std::string {
             // (path: string)
-            std::filesystem::path path (jsonUint8arrToString(json::parse(req)[0]));
+            std::filesystem::path path (formatPath(jsonUint8arrToString(json::parse(req)[0])));
             if (!std::filesystem::exists(path)) {
                 spdlog::error("No file exists at " + path.string());
                 return "null";
@@ -413,7 +413,7 @@ RenWeb::Window* RenWeb::Window::bindAll() {
             json params = json::parse(req);
             std::string resource = jsonUint8arrToString(params[0]);
             if (RenWeb::WebServer::isURI(resource)) {
-                for (int i = 0; i < resource.length(); i++) {
+                for (size_t i = 0; i < resource.length(); i++) {
                     if (resource[i] == '\\') resource[i] = '/';
                 }
                 w->openURI(resource);

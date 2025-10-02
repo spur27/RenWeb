@@ -314,8 +314,7 @@ std::vector<std::string> RenWeb::Window::openChooseFilesDialog(bool multi, bool 
 }
 
 RenWeb::Window* RenWeb::Window::sendNotif(std::string title, std::string message, std::string icon_path) {
-    // Fork this library and give it more functionality to do what you want soon
-    pfd::notify(title, message);
+    pfd::notify(title, message, icon_path);
     return this;
 }
 

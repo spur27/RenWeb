@@ -14,7 +14,7 @@
 #include <algorithm>
 #include <string>
 #include <cstdlib>  
-#include <portable-file-dialogs.h>
+#include <portable-file-dialogs-mod.hpp>
 #if defined(_WIN32)
 #include <windows.h>
 #include <commdlg.h> 
@@ -69,7 +69,7 @@ namespace RenWeb {
             RenWeb::Window* show();
 
             std::vector<std::string> openChooseFilesDialog(bool=false, bool=false, std::vector<std::string> filteration=std::vector<std::string>(), std::string=RenWeb::Info::File::dir);
-            RenWeb::Window* sendNotif(std::string, std::string="Summary", std::string=std::filesystem::path(RenWeb::Info::File::dir).append("resource").append("app.ico").string());
+            RenWeb::Window* sendNotif(std::string, std::string="Summary", std::string=std::filesystem::path(RenWeb::Info::File::dir).append("resource").append("app.png").string());
             RenWeb::Window* openURI(std::string);
 
             void start();

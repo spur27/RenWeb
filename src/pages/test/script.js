@@ -253,7 +253,7 @@ document.querySelector(".send_notif_2").onclick = async () => {
 };
 
 document.querySelector(".send_notif_3").onclick = async () => {
-    await Util.sendNotif("awfijawsoife", "awfoejfaow", `${await Util.getApplicationDirPath()}/resource/test.ico`);
+    await Util.sendNotif("awfijawsoife", "awfoejfaow", `${await Util.getApplicationDirPath()}/resource/test.png`);
 };
 
 document.querySelector(".open_uri_1").onclick = async () => {
