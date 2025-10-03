@@ -69,7 +69,11 @@ namespace RenWeb {
             RenWeb::Window* show();
 
             std::vector<std::string> openChooseFilesDialog(bool=false, bool=false, std::vector<std::string> filteration=std::vector<std::string>(), std::string=RenWeb::Info::File::dir);
+#if defined(_WIN32)
+            RenWeb::Window* sendNotif(std::string, std::string="Summary", std::string=std::filesystem::path(RenWeb::Info::File::dir).append("resource").append("app.ico").string());
+#else
             RenWeb::Window* sendNotif(std::string, std::string="Summary", std::string=std::filesystem::path(RenWeb::Info::File::dir).append("resource").append("app.png").string());
+#endif
             RenWeb::Window* openURI(std::string);
 
             void start();

@@ -314,6 +314,7 @@ std::vector<std::string> RenWeb::Window::openChooseFilesDialog(bool multi, bool 
 }
 
 RenWeb::Window* RenWeb::Window::sendNotif(std::string title, std::string message, std::string icon_path) {
+    spdlog::debug("Trying to display icon with path " + icon_path);
     pfd::notify(title, message, icon_path);
     return this;
 }

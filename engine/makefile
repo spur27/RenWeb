@@ -99,13 +99,21 @@ EXE := $(shell cd ../scripts && npx tsx ./src/getname.ts)$(EXE_EXT)
 # Paths 
 # -----------------------------------------------------------------------------
 BUILD_PATH :=  ../build
+LIC_PATH :=    ../LICENSE
 SRC_PATH :=    ./src
 OBJ_PATH :=    $(SRC_PATH)/.build
 INC_PATH :=    ./include
+ifeq ($(OS_NAME), Windows)
+EXTERN_INC_PATHS := \
+	$(addprefix /I, $(wildcard external/*/)) \
+	$(addprefix /I, $(wildcard external/*/include)) \
+	$(addprefix /I, external/webview/core/include)
+else 
 EXTERN_INC_PATHS := \
 	$(addprefix -I, $(wildcard external/*/)) \
 	$(addprefix -I, $(wildcard external/*/include)) \
 	$(addprefix -I, external/webview/core/include)
+endif
 RC_PATH :=    ./src/.build/app.res
 # -----------------------------------------------------------------------------
 # Static Linked Libraries
@@ -187,6 +195,15 @@ $(OBJ_PATH):
 	$(call step,Object Path,Making path at $@)
 	mkdir -p $@
 	$(call step,Object Path [DONE],Making path at $@)
+# -----------------------------------------------------------------------------
+# RULE: Copy license
+# -----------------------------------------------------------------------------
+# BROKEN
+$(LIC_PATH):
+	$(call step,Copy License(s), Copying License at $@)
+	cp $@ $(BUILD_PATH)/LICENSE
+	$(call step,Copy License(s) [DONE] Copying License at $@)
+
 # -----------------------------------------------------------------------------
 # COMMAND: Remove build files and exe
 # -----------------------------------------------------------------------------
