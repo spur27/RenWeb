@@ -314,6 +314,12 @@ std::vector<std::string> RenWeb::Window::openChooseFilesDialog(bool multi, bool 
 }
 
 RenWeb::Window* RenWeb::Window::sendNotif(std::string title, std::string message, std::string icon_path) {
+#if defined(_WIN32)
+    spdlog::debug(icon_path.substr(icon_path.length()-3, 3));
+    if (icon_path.length() > 2 && icon_path.substr(icon_path.length()-3, 3) != "ico") {
+        icon_path = icon_path.substr(0, icon_path.find_last_of('.')) + ".ico";
+    }
+#endif
     spdlog::debug("Trying to display icon with path " + icon_path);
     pfd::notify(title, message, icon_path);
     return this;

@@ -36,7 +36,7 @@ void RenWeb::App::run(int argc, char** argv) {
         } // add more else ifs here
 
         this->pages = vm["pages"].as<std::vector<std::string>>();
-        const unsigned int pages_vec_size = RenWeb::App::pages.size();
+        const unsigned int pages_vec_size = static_cast<unsigned int>(RenWeb::App::pages.size());
         const unsigned int log_level = vm["log_level"].as<unsigned int>();
         if (pages_vec_size <= 1) {
             if (this->pages.empty() || this->pages[0] == "_") {
